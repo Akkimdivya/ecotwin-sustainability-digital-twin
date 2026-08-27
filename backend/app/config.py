@@ -14,6 +14,18 @@ def _default_data_dir() -> Path:
     return Path(__file__).resolve().parents[2] / "data"
 
 
+def _env_bool(name: str, default: bool = False) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    raise ValueError(f"{name} must be true or false")
+
+
 @dataclass(frozen=True, slots=True)
 class Settings:
     app_env: str
@@ -23,6 +35,10 @@ class Settings:
     bigquery_dataset: str
     bigquery_location: str
     log_level: str
+    gemini_enabled: bool = False
+    gemini_model: str = "gemini-2.5-flash"
+    gemini_location: str = "global"
+    gemini_timeout_seconds: float = 10
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -40,4 +56,8 @@ class Settings:
             bigquery_dataset=os.getenv("ECOTWIN_BIGQUERY_DATASET", "ecotwin_demo"),
             bigquery_location=os.getenv("ECOTWIN_BIGQUERY_LOCATION", "us-central1"),
             log_level=os.getenv("ECOTWIN_LOG_LEVEL", "INFO").upper(),
+            gemini_enabled=_env_bool("ECOTWIN_GEMINI_ENABLED"),
+            gemini_model=os.getenv("ECOTWIN_GEMINI_MODEL", "gemini-2.5-flash"),
+            gemini_location=os.getenv("ECOTWIN_GEMINI_LOCATION", "global"),
+            gemini_timeout_seconds=float(os.getenv("ECOTWIN_GEMINI_TIMEOUT_SECONDS", "10")),
         )

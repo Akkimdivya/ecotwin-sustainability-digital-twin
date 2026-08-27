@@ -10,6 +10,7 @@ from .domain import (
     SimulationRun,
     TelemetryDaily,
 )
+from .explanation import ExplanationContent, SimulationExplanation
 from .simulation import RightsizeRequest, RightsizeResult
 from .twin import TwinEdge, TwinNode, TwinNodeDetail, TwinSnapshot
 from .waste import DetectorThresholds, WasteFinding, WasteReport
@@ -32,4 +33,6 @@ __all__ = [
     "WasteReport",
     "RightsizeRequest",
     "RightsizeResult",
+    "ExplanationContent",
+    "SimulationExplanation",
 ]

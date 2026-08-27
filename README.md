@@ -10,13 +10,14 @@ Repository: <https://github.com/Akkimdivya/ecotwin-sustainability-digital-twin>
 
 ## Current build status
 
-Completed Modules 1 through 5:
+Completed Modules 1 through 6:
 
 - Module 1 - delivery foundation: repository, environment configuration, FastAPI service, health checks, Docker, CI and security exclusions.
 - Module 2 - cloud data foundation: validated controlled dataset, live BigQuery schema and data, local fallback, read-only catalog APIs and tests.
 - Module 3 - digital twin: immutable topology snapshots, validated dependency edges, evidence-backed node states and an interactive graph with node details.
 - Module 4 - waste detection: explicit idle-compute, over-provisioning and unattached-storage rules with evidence, confidence, limitations and simulation eligibility.
 - Module 5 - what-if simulation: deterministic before/after cost, estimated operational carbon, performance pressure, risk, confidence, assumptions and source cards.
+- Module 6 - Gemini explanation: structured Vertex AI guidance grounded in the simulation JSON, schema validation, timeout, retry, per-simulation cache and deterministic demo-safe fallback.
 
 Google Cloud foundation verified on August 27, 2026:
 
@@ -27,7 +28,7 @@ Google Cloud foundation verified on August 27, 2026:
 - API read mode verified: `bigquery` with no fallback
 - No API keys or service-account key files created
 
-Next modules will add the Gemini explanation and deploy the complete application to Cloud Run.
+Next: deploy the complete application to Cloud Run and capture the final evidence package.
 
 ## Quick start
 
@@ -72,6 +73,8 @@ ruff check backend
 | `GET /api/findings` | Versioned waste report with thresholds and evidence |
 | `GET /api/findings/{finding_id}` | One explainable optimization finding |
 | `POST /api/simulations` | Run a read-only compute right-sizing scenario |
+| `GET /api/ai-status` | Gemini mode, model, location and credential policy |
+| `POST /api/explanations` | Re-run the deterministic scenario and explain its exact result |
 
 ## Controlled data
 
@@ -122,6 +125,7 @@ docker run --rm -p 8080:8080 -e ECOTWIN_DATA_MODE=local ecotwin
 - [Digital twin methodology](docs/digital-twin.md)
 - [Waste detection methodology](docs/waste-detection.md)
 - [What-if simulation methodology](docs/simulation.md)
+- [Gemini explanation and safety contract](docs/gemini-explanation.md)
 - [Google Cloud and BigQuery evidence](docs/evidence/cloud-foundation.md)
 
 ## Data integrity and security

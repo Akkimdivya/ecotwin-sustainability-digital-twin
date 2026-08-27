@@ -5,15 +5,15 @@
 **Plan prepared:** August 27, 2026 (IST)  
 **Checkpoint objective:** Prove the idea is implemented with one reliable, end-to-end, deployed flow.
 
-## Implementation status - August 27, 2026
+## Implementation status - August 28, 2026
 
 - [x] Delivery foundation: FastAPI, configuration, Docker, CI, security exclusions and automated tests.
 - [x] Cloud data foundation: controlled dataset, validation, BigQuery loader, live `ecotwin_demo` dataset and read-only data APIs.
 - [x] Digital twin builder: deterministic nine-node/seven-edge snapshot, API and interactive evidence panel.
 - [x] Waste detection engine: three explainable detectors, evidence cards and threshold-boundary tests.
 - [x] What-if simulation engine: deterministic cost, carbon, performance, risk and confidence result.
-- [ ] Gemini explanation.
-- [ ] Interactive frontend.
+- [x] Gemini explanation: Vertex AI structured output, numerical guardrails, retry, timeout, cache and deterministic fallback.
+- [x] Interactive frontend: full cloud-data-to-explanation hero flow.
 - [ ] Cloud Run deployment and final evidence package.
 
 The completed cloud foundation uses project `ecotwin-sustainability-2026`, location `us-central1`, and data version `demo-2026-08-27-v1`. See [cloud foundation evidence](docs/evidence/cloud-foundation.md).
@@ -727,8 +727,8 @@ The checkpoint is ready only when all boxes are checked:
 - [ ] Digital twin contains meaningful nodes and dependencies.
 - [ ] Idle compute, over-provisioned compute, and storage waste are detected.
 - [ ] 4→2 vCPU simulation returns deterministic cost, carbon, performance, risk, and confidence.
-- [ ] Gemini explains the exact result and includes validation and rollback steps.
-- [ ] Gemini and BigQuery fallback paths work.
+- [x] Gemini explains the exact result and includes validation and rollback steps.
+- [x] Gemini and BigQuery fallback paths work.
 - [ ] No production-mutation API exists.
 - [ ] No secret is present in Git history, logs, screenshots, or frontend bundle.
 - [ ] Tests pass and golden scenario is reproducible.

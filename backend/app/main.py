@@ -16,6 +16,7 @@ from app.models import (
     DataStatus,
     RightsizeRequest,
     RightsizeResult,
+    SimulationExplanation,
     TwinNodeDetail,
     TwinSnapshot,
     WasteFinding,
@@ -23,6 +24,7 @@ from app.models import (
 )
 from app.repositories import RepositorySelection, select_repository
 from app.services import (
+    ExplanationService,
     SimulationValidationError,
     build_twin_snapshot,
     detect_waste,
@@ -60,6 +62,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         )
         app.state.twin_snapshot = snapshot
         app.state.waste_report = detect_waste(snapshot)
+        app.state.explanation_service = ExplanationService(resolved_settings)
         yield
 
     app = FastAPI(
@@ -88,6 +91,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     def waste_report(request: Request) -> WasteReport:
         return request.app.state.waste_report
+
+    def explanation_service(request: Request) -> ExplanationService:
+        return request.app.state.explanation_service
 
     @app.get("/", include_in_schema=False)
     def root():
@@ -209,6 +215,36 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             )
         except SimulationValidationError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    @app.get("/api/ai-status", tags=["Gemini explanation"])
+    def ai_status() -> dict[str, Any]:
+        return {
+            "enabled": resolved_settings.gemini_enabled,
+            "mode": "VERTEX_AI" if resolved_settings.gemini_enabled else "FALLBACK_READY",
+            "model": resolved_settings.gemini_model,
+            "location": resolved_settings.gemini_location,
+            "authentication": "APPLICATION_DEFAULT_CREDENTIALS",
+            "api_key_required": False,
+        }
+
+    @app.post(
+        "/api/explanations",
+        response_model=SimulationExplanation,
+        tags=["Gemini explanation"],
+    )
+    async def explain_simulation(
+        payload: RightsizeRequest,
+        request: Request,
+    ) -> SimulationExplanation:
+        try:
+            result = simulate_rightsize(
+                selection(request).catalog,
+                twin_snapshot(request),
+                payload,
+            )
+        except SimulationValidationError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return await explanation_service(request).explain(result)
 
     return app
 

@@ -1,6 +1,6 @@
 # Google Cloud foundation evidence
 
-**Verified:** August 27, 2026 (IST)  
+**Verified:** August 27-28, 2026 (IST)
 **Project:** `ecotwin-sustainability-2026`  
 **Project number:** `1075889318331`  
 **Region/location:** `us-central1`  
@@ -16,6 +16,17 @@
 - Created the BigQuery dataset and seven tables.
 - Verified the backend repository and HTTP APIs against live BigQuery data.
 - Created no API keys and downloaded no service-account credentials.
+- Verified a structured `gemini-2.5-flash` request through Vertex AI and ADC in the approved Cloud Shell session.
+
+## Vertex AI verification
+
+On August 28, 2026, a read-only structured-output smoke test called `gemini-2.5-flash` through Vertex AI in location `global`. It used the signed-in Cloud Shell identity through Application Default Credentials and returned:
+
+```json
+{"status":"VERIFIED","message":"Read-only EcoTwin explanation test confirmed."}
+```
+
+No API key or service-account key file was created. The application additionally includes a deterministic fallback so the demonstration completes if Vertex AI is temporarily unavailable.
 
 ## BigQuery tables
 

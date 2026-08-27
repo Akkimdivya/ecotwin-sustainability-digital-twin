@@ -1,6 +1,6 @@
-# EcoTwin foundation architecture
+# EcoTwin architecture
 
-Modules 1-3 establish a provider-neutral catalog API and immutable digital twin backed by either BigQuery or the same validated local JSON dataset.
+EcoTwin provides a provider-neutral catalog API and immutable digital twin backed by either BigQuery or the same validated local JSON dataset. Deterministic code detects waste and simulates the scenario before Gemini explains the fixed result.
 
 ```mermaid
 flowchart LR
@@ -15,7 +15,12 @@ flowchart LR
     T --> S[Immutable topology snapshot]
     S --> F
     F --> U[Interactive SVG dashboard]
-    S --> N[Future waste and simulation modules]
+    S --> W[Waste detection]
+    W --> M[Deterministic what-if simulator]
+    M --> G[Vertex AI Gemini explanation]
+    M --> D[Deterministic explanation fallback]
+    G --> F
+    D --> F
 ```
 
 ## Data-mode behavior

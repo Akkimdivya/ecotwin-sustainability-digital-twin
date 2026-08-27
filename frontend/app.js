@@ -285,24 +285,60 @@ async function runSimulation(event) {
   button.disabled = true;
   error.classList.add("hidden");
   try {
+    const simulationRequest = {
+      resource_id: resourceId,
+      proposed_vcpu: Number(document.querySelector("#proposed-vcpu").value),
+      proposed_memory_gb: Number(document.querySelector("#proposed-memory").value),
+      growth_buffer_pct: Number(document.querySelector("#growth-buffer").value),
+    };
     const response = await fetch("/api/simulations", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        resource_id: resourceId,
-        proposed_vcpu: Number(document.querySelector("#proposed-vcpu").value),
-        proposed_memory_gb: Number(document.querySelector("#proposed-memory").value),
-        growth_buffer_pct: Number(document.querySelector("#growth-buffer").value),
-      }),
+      body: JSON.stringify(simulationRequest),
     });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.detail || `Simulation failed (${response.status})`);
     renderSimulation(payload);
+    loadExplanation(simulationRequest);
   } catch (failure) {
     error.textContent = failure.message;
     error.classList.remove("hidden");
   } finally {
     button.disabled = false;
+  }
+}
+
+async function loadExplanation(simulationRequest) {
+  const loading = document.querySelector("#ai-loading");
+  const content = document.querySelector("#ai-content");
+  const provider = document.querySelector("#ai-provider");
+  loading.textContent = "Explaining the deterministic result...";
+  loading.classList.remove("hidden");
+  content.classList.add("hidden");
+  provider.textContent = "Preparing";
+  try {
+    const response = await fetch("/api/explanations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(simulationRequest),
+    });
+    const explanation = await response.json();
+    if (!response.ok) throw new Error(explanation.detail || "Explanation unavailable");
+    provider.textContent = explanation.provider === "VERTEX_AI"
+      ? `Vertex AI / ${explanation.model}`
+      : "Deterministic fallback";
+    document.querySelector("#ai-summary").textContent = explanation.content.summary;
+    document.querySelector("#ai-recommendation").textContent = explanation.content.recommendation;
+    document.querySelector("#ai-rationale").textContent = explanation.content.rationale;
+    document.querySelector("#ai-validation-steps").innerHTML = explanation.content.validation_steps
+      .map((step) => `<li>${step}</li>`)
+      .join("");
+    document.querySelector("#ai-rollback").textContent = explanation.content.rollback_trigger;
+    loading.classList.add("hidden");
+    content.classList.remove("hidden");
+  } catch (failure) {
+    loading.textContent = `Explanation unavailable: ${failure.message}`;
+    provider.textContent = "Unavailable";
   }
 }
 

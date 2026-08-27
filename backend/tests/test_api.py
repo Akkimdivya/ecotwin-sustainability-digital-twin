@@ -48,6 +48,16 @@ def test_health_and_controlled_data_endpoints() -> None:
                 "proposed_memory_gb": 16,
             },
         )
+        ai_status = client.get("/api/ai-status")
+        explanation = client.post(
+            "/api/explanations",
+            json={
+                "resource_id": "vm-api-01",
+                "proposed_vcpu": 2,
+                "proposed_memory_gb": 8,
+                "growth_buffer_pct": 20,
+            },
+        )
         dashboard = client.get("/")
 
     assert health.status_code == 200
@@ -71,6 +81,11 @@ def test_health_and_controlled_data_endpoints() -> None:
     assert simulation.json()["impact"]["monthly_cost_savings_usd"] == 48.91
     assert simulation.json()["risk"]["level"] == "HIGH"
     assert invalid_simulation.status_code == 422
+    assert ai_status.json()["mode"] == "FALLBACK_READY"
+    assert ai_status.json()["api_key_required"] is False
+    assert explanation.status_code == 200
+    assert explanation.json()["provider"] == "DETERMINISTIC_FALLBACK"
+    assert explanation.json()["simulation_id"] == simulation.json()["simulation_id"]
     assert dashboard.status_code == 200
     assert "EcoTwin" in dashboard.text
 
