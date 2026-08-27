@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="EcoTwin sustainability digital twin for Google Cloud infrastructure"
+    />
+    <title>EcoTwin | Infrastructure Digital Twin</title>
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="EcoTwin home">
+          <span class="brand-mark" aria-hidden="true">E</span>
+          <span>
+            <strong>EcoTwin</strong>
+            <small>Sustainability control plane</small>
+          </span>
+        </a>
+        <div class="topbar-actions">
+          <span class="source-badge" id="source-badge">Loading source</span>
+          <a class="docs-link" href="/docs">API docs</a>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div>
+            <p class="eyebrow">Infrastructure intelligence / Digital twin</p>
+            <h1>See the cloud before you change it.</h1>
+            <p class="hero-copy">
+              A versioned, read-only map of resources, dependencies and utilization evidence.
+            </p>
+          </div>
+          <div class="safety-note">
+            <span class="pulse" aria-hidden="true"></span>
+            Simulation only - no production changes
+          </div>
+        </section>
+
+        <section class="summary-grid" aria-label="Digital twin summary">
+          <article class="metric-card">
+            <span>Resources</span><strong id="total-nodes">--</strong><small>normalized nodes</small>
+          </article>
+          <article class="metric-card">
+            <span>Dependencies</span><strong id="total-edges">--</strong><small>validated edges</small>
+          </article>
+          <article class="metric-card warning">
+            <span>Review states</span><strong id="review-count">--</strong><small>evidence-backed</small>
+          </article>
+          <article class="metric-card">
+            <span>Snapshot</span><strong class="compact" id="snapshot-id">--</strong><small id="snapshot-time">versioned</small>
+          </article>
+        </section>
+
+        <section class="workspace">
+          <article class="graph-card">
+            <div class="card-heading">
+              <div>
+                <p class="eyebrow">Topology</p>
+                <h2>Cloud dependency map</h2>
+              </div>
+              <div class="legend" aria-label="Node state legend">
+                <span><i class="healthy"></i>Healthy</span>
+                <span><i class="over_provisioned"></i>Right-size</span>
+                <span><i class="idle"></i>Idle</span>
+                <span><i class="storage_waste"></i>Storage waste</span>
+              </div>
+            </div>
+            <div class="graph-toolbar">
+              <button class="filter active" data-filter="all">All resources</button>
+              <button class="filter" data-filter="review">Needs review</button>
+              <span id="graph-caption">Preparing topology...</span>
+            </div>
+            <div class="graph-stage" id="graph-stage">
+              <div class="loading-state" id="loading-state">
+                <span class="loader"></span>
+                Building immutable twin snapshot
+              </div>
+              <svg
+                id="twin-graph"
+                viewBox="0 0 900 570"
+                role="img"
+                aria-label="Interactive cloud infrastructure dependency graph"
+              ></svg>
+            </div>
+          </article>
+
+          <aside class="evidence-card" id="evidence-card" aria-live="polite">
+            <div class="empty-evidence" id="empty-evidence">
+              <div class="empty-icon">+</div>
+              <h2>Select a resource</h2>
+              <p>Choose a node to inspect configuration, telemetry and dependency evidence.</p>
+            </div>
+            <div class="evidence-content hidden" id="evidence-content">
+              <div class="evidence-header">
+                <div>
+                  <p class="eyebrow" id="node-type">Resource</p>
+                  <h2 id="node-name">--</h2>
+                  <code id="node-id">--</code>
+                </div>
+                <span class="state-pill" id="node-state">--</span>
+              </div>
+              <p class="reason" id="node-reason"></p>
+
+              <div class="section-title">Configuration</div>
+              <dl class="fact-grid" id="configuration-facts"></dl>
+
+              <div class="section-title">Seven-day evidence</div>
+              <dl class="fact-grid" id="metric-facts"></dl>
+
+              <div class="section-title">Connections</div>
+              <div class="connections" id="connection-list"></div>
+            </div>
+          </aside>
+        </section>
+
+        <footer>
+          <span id="data-version">Data version loading</span>
+          <span>Read-only checkpoint prototype</span>
+        </footer>
+      </main>
+    </div>
+    <script src="/assets/app.js" defer></script>
+  </body>
+</html>

@@ -4,14 +4,17 @@ from __future__ import annotations
 
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.config import Settings
-from app.models import DataStatus
+from app.models import DataStatus, TwinNodeDetail, TwinSnapshot
 from app.repositories import RepositorySelection, select_repository
+from app.services import build_twin_snapshot
 
 
 def _configure_logging(level: str) -> None:
@@ -24,10 +27,24 @@ def _configure_logging(level: str) -> None:
 def create_app(settings: Settings | None = None) -> FastAPI:
     resolved_settings = settings or Settings.from_env()
     _configure_logging(resolved_settings.log_level)
+    frontend_dir = Path(__file__).resolve().parents[2] / "frontend"
+
+    def display_source_for(current: RepositorySelection) -> str:
+        return (
+            "CONTROLLED_DEMO"
+            if current.active_mode == "bigquery" or current.fallback_reason is None
+            else "LOCAL_DEMO_FALLBACK"
+        )
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-        app.state.selection = select_repository(resolved_settings)
+        current = select_repository(resolved_settings)
+        app.state.selection = current
+        app.state.twin_snapshot = build_twin_snapshot(
+            current.catalog,
+            data_mode=display_source_for(current),
+            active_repository=current.active_mode,
+        )
         yield
 
     app = FastAPI(
@@ -40,6 +57,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
 
+    if frontend_dir.is_dir():
+        app.mount("/assets", StaticFiles(directory=frontend_dir), name="frontend-assets")
+
     @app.exception_handler(Exception)
     async def unhandled_error(_: Request, exc: Exception) -> JSONResponse:
         logging.getLogger("ecotwin.errors").exception("Unhandled request error", exc_info=exc)
@@ -48,11 +68,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def selection(request: Request) -> RepositorySelection:
         return request.app.state.selection
 
-    @app.get("/", tags=["system"])
-    def root() -> dict[str, str]:
+    def twin_snapshot(request: Request) -> TwinSnapshot:
+        return request.app.state.twin_snapshot
+
+    @app.get("/", include_in_schema=False)
+    def root():
+        index = frontend_dir / "index.html"
+        if index.is_file():
+            return FileResponse(index)
         return {
             "name": "EcoTwin API",
-            "message": "Simulation only — no production changes",
+            "message": "Simulation only - no production changes",
             "docs": "/docs",
         }
 
@@ -69,15 +95,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get("/api/data-status", response_model=DataStatus, tags=["data"])
     def data_status(request: Request) -> DataStatus:
         current = selection(request)
-        display_source = (
-            "CONTROLLED_DEMO"
-            if current.active_mode == "bigquery" or current.fallback_reason is None
-            else "LOCAL_DEMO_FALLBACK"
-        )
         return DataStatus(
             requested_mode=resolved_settings.data_mode,
             active_mode=current.active_mode,  # type: ignore[arg-type]
-            display_source=display_source,
+            display_source=display_source_for(current),
             data_version=current.catalog.data_version,
             resource_count=len(current.catalog.resources),
             fallback_reason=current.fallback_reason,
@@ -105,6 +126,32 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get("/api/carbon-factors", tags=["data"])
     def carbon_factors(request: Request):
         return selection(request).catalog.carbon_factors
+
+    @app.get("/api/twin", response_model=TwinSnapshot, tags=["digital twin"])
+    def digital_twin(request: Request) -> TwinSnapshot:
+        """Return the immutable topology snapshot used throughout a simulation flow."""
+
+        return twin_snapshot(request)
+
+    @app.get(
+        "/api/twin/nodes/{resource_id}",
+        response_model=TwinNodeDetail,
+        tags=["digital twin"],
+    )
+    def twin_node(resource_id: str, request: Request) -> TwinNodeDetail:
+        snapshot = twin_snapshot(request)
+        node = next(
+            (candidate for candidate in snapshot.nodes if candidate.id == resource_id),
+            None,
+        )
+        if node is None:
+            raise HTTPException(status_code=404, detail="Twin node not found")
+        return TwinNodeDetail(
+            snapshot_id=snapshot.snapshot_id,
+            node=node,
+            incoming_edges=tuple(edge for edge in snapshot.edges if edge.target == resource_id),
+            outgoing_edges=tuple(edge for edge in snapshot.edges if edge.source == resource_id),
+        )
 
     return app
 

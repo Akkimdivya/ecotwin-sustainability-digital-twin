@@ -9,7 +9,7 @@
 
 - [x] Delivery foundation: FastAPI, configuration, Docker, CI, security exclusions and automated tests.
 - [x] Cloud data foundation: controlled dataset, validation, BigQuery loader, live `ecotwin_demo` dataset and read-only data APIs.
-- [ ] Digital twin builder.
+- [x] Digital twin builder: deterministic nine-node/seven-edge snapshot, API and interactive evidence panel.
 - [ ] Waste detection engine.
 - [ ] What-if simulation engine.
 - [ ] Gemini explanation.

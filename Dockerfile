@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir -r backend/requirements.txt
 
 COPY backend ./backend
 COPY data ./data
+COPY frontend ./frontend
 
 WORKDIR /app/backend
 CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]
-

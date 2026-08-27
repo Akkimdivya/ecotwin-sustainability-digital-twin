@@ -10,6 +10,7 @@ from .domain import (
     SimulationRun,
     TelemetryDaily,
 )
+from .twin import TwinEdge, TwinNode, TwinNodeDetail, TwinSnapshot
 
 __all__ = [
     "CarbonFactor",
@@ -20,4 +21,8 @@ __all__ = [
     "ResourceCatalog",
     "SimulationRun",
     "TelemetryDaily",
+    "TwinEdge",
+    "TwinNode",
+    "TwinNodeDetail",
+    "TwinSnapshot",
 ]

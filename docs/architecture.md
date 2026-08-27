@@ -1,6 +1,6 @@
 # EcoTwin foundation architecture
 
-Modules 1–2 establish a provider-neutral catalog API backed by either BigQuery or the same validated local JSON dataset.
+Modules 1-3 establish a provider-neutral catalog API and immutable digital twin backed by either BigQuery or the same validated local JSON dataset.
 
 ```mermaid
 flowchart LR
@@ -11,7 +11,11 @@ flowchart LR
     B --> R[Repository selector]
     L --> R
     R --> F[FastAPI read-only endpoints]
-    F --> U[Future dashboard and simulation modules]
+    R --> T[Deterministic twin builder]
+    T --> S[Immutable topology snapshot]
+    S --> F
+    F --> U[Interactive SVG dashboard]
+    S --> N[Future waste and simulation modules]
 ```
 
 ## Data-mode behavior
@@ -28,4 +32,3 @@ The data source is always visible. Controlled data is never presented as measure
 - No resource mutation endpoint exists.
 - Cloud credentials are obtained through Application Default Credentials at runtime, not committed keys.
 - BigQuery identifiers are validated before they are interpolated into table-qualified SQL.
-
