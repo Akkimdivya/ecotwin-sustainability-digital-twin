@@ -131,6 +131,96 @@
           </div>
         </section>
 
+        <section class="simulator-card" id="what-if-simulator" aria-labelledby="simulator-title">
+          <div class="card-heading simulator-heading">
+            <div>
+              <p class="eyebrow">What-if laboratory</p>
+              <h2 id="simulator-title">Test a right-size decision</h2>
+            </div>
+            <span class="simulation-safety">Read-only calculation</span>
+          </div>
+          <div class="simulator-layout">
+            <form class="simulation-form" id="simulation-form">
+              <div class="selected-resource">
+                <span>Selected resource</span>
+                <strong id="simulation-resource-name">api-vm-01</strong>
+                <code id="simulation-resource-id">vm-api-01</code>
+              </div>
+              <div class="config-comparison">
+                <div>
+                  <span>Current</span>
+                  <strong id="current-vcpu">4 vCPU</strong>
+                  <small id="current-memory">16 GB memory</small>
+                </div>
+                <div class="change-arrow" aria-hidden="true">→</div>
+                <div class="proposed-config">
+                  <span>Proposed</span>
+                  <label>vCPU <input id="proposed-vcpu" type="number" value="2" min="2" max="2" /></label>
+                  <label>Memory <input id="proposed-memory" type="number" value="8" min="8" max="8" step="0.5" /> GB</label>
+                </div>
+              </div>
+              <label class="buffer-control" for="growth-buffer">
+                <span>Utilization growth buffer <strong id="growth-buffer-value">20%</strong></span>
+                <input id="growth-buffer" type="range" min="0" max="40" value="20" step="5" />
+                <small>Stress the projection for expected demand growth.</small>
+              </label>
+              <button class="simulate-button" type="submit">
+                <span>Run what-if simulation</span>
+                <small>Cost + carbon + performance + risk</small>
+              </button>
+              <p class="form-error hidden" id="simulation-error"></p>
+            </form>
+
+            <div class="simulation-placeholder" id="simulation-placeholder">
+              <div class="simulation-orbit" aria-hidden="true"><span></span></div>
+              <h3>Ready to calculate</h3>
+              <p>EcoTwin will compare the selected configuration without modifying Google Cloud.</p>
+            </div>
+
+            <div class="simulation-results hidden" id="simulation-results" aria-live="polite">
+              <div class="result-header">
+                <div>
+                  <p class="eyebrow">Simulation result</p>
+                  <code id="simulation-id">--</code>
+                </div>
+                <span class="risk-badge" id="risk-level">-- risk</span>
+              </div>
+              <div class="impact-grid">
+                <article>
+                  <span>Monthly cost</span>
+                  <div><s id="cost-before">--</s><strong id="cost-after">--</strong></div>
+                  <small id="cost-impact">--</small>
+                </article>
+                <article>
+                  <span>Operational carbon</span>
+                  <div><s id="carbon-before">--</s><strong id="carbon-after">--</strong></div>
+                  <small id="carbon-impact">--</small>
+                </article>
+              </div>
+              <div class="projection-row">
+                <div class="projection-heading"><span>Predicted CPU p95</span><strong id="cpu-projection">--</strong></div>
+                <div class="projection-track"><span id="cpu-bar"></span><i class="risk-boundary"></i></div>
+                <small>Low-risk boundary at 65%</small>
+              </div>
+              <div class="projection-row">
+                <div class="projection-heading"><span>Predicted memory p95</span><strong id="memory-projection">--</strong></div>
+                <div class="projection-track"><span id="memory-bar"></span><i class="memory-boundary"></i></div>
+                <small>Minimum target headroom: 25%</small>
+              </div>
+              <div class="risk-reasons" id="risk-reasons"></div>
+              <div class="confidence-row">
+                <span>Confidence</span>
+                <strong id="confidence-level">--</strong>
+                <small id="confidence-reason">--</small>
+              </div>
+              <details>
+                <summary>Methodology and assumptions</summary>
+                <ul id="simulation-assumptions"></ul>
+              </details>
+            </div>
+          </div>
+        </section>
+
         <footer>
           <span id="data-version">Data version loading</span>
           <span>Read-only checkpoint prototype</span>

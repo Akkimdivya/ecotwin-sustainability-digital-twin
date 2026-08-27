@@ -204,6 +204,8 @@ function renderOpportunities() {
       .slice(0, 4)
       .map(([key, value]) => `<span class="evidence-chip">${formatEvidenceKey(key)}: ${value}</span>`)
       .join("");
+    const action = finding.waste_type === "over_provisioned_compute" ? "simulate" : "inspect";
+    const buttonLabel = action === "simulate" ? "Simulate recommendation" : "Inspect evidence";
     return `
       <article class="opportunity">
         <div class="opportunity-top">
@@ -214,15 +216,94 @@ function renderOpportunities() {
         <code>${finding.resource_name}</code>
         <p>${finding.reason}</p>
         <div class="evidence-strip">${chips}</div>
-        <button data-resource-id="${finding.resource_id}">Inspect evidence</button>
+        <button data-resource-id="${finding.resource_id}" data-action="${action}">${buttonLabel}</button>
       </article>`;
   }).join("");
   grid.querySelectorAll("button[data-resource-id]").forEach((button) => {
     button.addEventListener("click", () => {
       selectNode(button.dataset.resourceId);
-      document.querySelector("#evidence-card").scrollIntoView({ behavior: "smooth", block: "start" });
+      if (button.dataset.action === "simulate") {
+        prepareSimulation(button.dataset.resourceId);
+        document.querySelector("#what-if-simulator").scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        document.querySelector("#evidence-card").scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     });
   });
+}
+
+function prepareSimulation(resourceId) {
+  const node = twin.nodes.find((candidate) => candidate.id === resourceId);
+  if (!node) return;
+  selectedNodeId = resourceId;
+  const currentVcpu = Number(node.configuration.vcpu);
+  const currentMemory = Number(node.configuration.memory_gb);
+  document.querySelector("#simulation-resource-name").textContent = node.name;
+  document.querySelector("#simulation-resource-id").textContent = node.id;
+  document.querySelector("#current-vcpu").textContent = `${currentVcpu} vCPU`;
+  document.querySelector("#current-memory").textContent = `${currentMemory} GB memory`;
+  const proposedVcpu = document.querySelector("#proposed-vcpu");
+  const proposedMemory = document.querySelector("#proposed-memory");
+  const targetVcpu = Math.max(1, Math.floor(currentVcpu / 2));
+  const targetMemory = targetVcpu * 4;
+  proposedVcpu.min = String(targetVcpu);
+  proposedVcpu.max = String(targetVcpu);
+  proposedVcpu.value = String(targetVcpu);
+  proposedMemory.min = String(targetMemory);
+  proposedMemory.max = String(targetMemory);
+  proposedMemory.value = String(targetMemory);
+}
+
+function renderSimulation(result) {
+  document.querySelector("#simulation-placeholder").classList.add("hidden");
+  document.querySelector("#simulation-results").classList.remove("hidden");
+  document.querySelector("#simulation-id").textContent = `${result.simulation_id} / ${result.method_version}`;
+  const riskBadge = document.querySelector("#risk-level");
+  riskBadge.textContent = `${result.risk.level} risk`;
+  riskBadge.className = `risk-badge ${result.risk.level}`;
+  document.querySelector("#cost-before").textContent = `$${result.before.monthly_cost_usd.toFixed(2)}`;
+  document.querySelector("#cost-after").textContent = `$${result.after.monthly_cost_usd.toFixed(2)}`;
+  document.querySelector("#cost-impact").textContent = `$${result.impact.monthly_cost_savings_usd.toFixed(2)} saved / ${result.impact.monthly_cost_savings_pct}%`;
+  document.querySelector("#carbon-before").textContent = `${result.before.estimated_carbon_kgco2e.toFixed(2)} kg`;
+  document.querySelector("#carbon-after").textContent = `${result.after.estimated_carbon_kgco2e.toFixed(2)} kg`;
+  document.querySelector("#carbon-impact").textContent = `${result.impact.carbon_reduction_kgco2e.toFixed(2)} kg reduced / ${result.impact.carbon_reduction_pct}%`;
+  document.querySelector("#cpu-projection").textContent = `${result.performance.current_cpu_p95_pct}% → ${result.performance.predicted_cpu_p95_pct}%`;
+  document.querySelector("#memory-projection").textContent = `${result.performance.current_memory_p95_pct}% → ${result.performance.predicted_memory_p95_pct}%`;
+  document.querySelector("#cpu-bar").style.width = `${result.performance.predicted_cpu_p95_pct}%`;
+  document.querySelector("#memory-bar").style.width = `${result.performance.predicted_memory_p95_pct}%`;
+  document.querySelector("#risk-reasons").innerHTML = result.risk.reasons.map((reason) => `<div>${reason}</div>`).join("");
+  document.querySelector("#confidence-level").textContent = result.confidence;
+  document.querySelector("#confidence-reason").textContent = result.confidence_reason;
+  document.querySelector("#simulation-assumptions").innerHTML = result.assumptions.map((assumption) => `<li>${assumption}</li>`).join("");
+}
+
+async function runSimulation(event) {
+  event.preventDefault();
+  const button = event.currentTarget.querySelector("button[type='submit']");
+  const error = document.querySelector("#simulation-error");
+  const resourceId = document.querySelector("#simulation-resource-id").textContent;
+  button.disabled = true;
+  error.classList.add("hidden");
+  try {
+    const response = await fetch("/api/simulations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        resource_id: resourceId,
+        proposed_vcpu: Number(document.querySelector("#proposed-vcpu").value),
+        proposed_memory_gb: Number(document.querySelector("#proposed-memory").value),
+        growth_buffer_pct: Number(document.querySelector("#growth-buffer").value),
+      }),
+    });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.detail || `Simulation failed (${response.status})`);
+    renderSimulation(payload);
+  } catch (failure) {
+    error.textContent = failure.message;
+    error.classList.remove("hidden");
+  } finally {
+    button.disabled = false;
+  }
 }
 
 async function initialize() {
@@ -253,4 +334,8 @@ async function initialize() {
 }
 
 document.querySelectorAll(".filter").forEach((button) => button.addEventListener("click", () => applyFilter(button.dataset.filter)));
+document.querySelector("#growth-buffer").addEventListener("input", (event) => {
+  document.querySelector("#growth-buffer-value").textContent = `${event.target.value}%`;
+});
+document.querySelector("#simulation-form").addEventListener("submit", runSimulation);
 initialize();

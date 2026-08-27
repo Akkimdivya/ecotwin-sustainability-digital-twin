@@ -12,9 +12,22 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import Settings
-from app.models import DataStatus, TwinNodeDetail, TwinSnapshot, WasteFinding, WasteReport
+from app.models import (
+    DataStatus,
+    RightsizeRequest,
+    RightsizeResult,
+    TwinNodeDetail,
+    TwinSnapshot,
+    WasteFinding,
+    WasteReport,
+)
 from app.repositories import RepositorySelection, select_repository
-from app.services import build_twin_snapshot, detect_waste
+from app.services import (
+    SimulationValidationError,
+    build_twin_snapshot,
+    detect_waste,
+    simulate_rightsize,
+)
 
 
 def _configure_logging(level: str) -> None:
@@ -179,6 +192,23 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if finding is None:
             raise HTTPException(status_code=404, detail="Waste finding not found")
         return finding
+
+    @app.post(
+        "/api/simulations",
+        response_model=RightsizeResult,
+        tags=["what-if simulation"],
+    )
+    def run_simulation(payload: RightsizeRequest, request: Request) -> RightsizeResult:
+        """Calculate a read-only scenario; no Google Cloud resource is mutated."""
+
+        try:
+            return simulate_rightsize(
+                selection(request).catalog,
+                twin_snapshot(request),
+                payload,
+            )
+        except SimulationValidationError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     return app
 

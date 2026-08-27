@@ -11,7 +11,7 @@
 - [x] Cloud data foundation: controlled dataset, validation, BigQuery loader, live `ecotwin_demo` dataset and read-only data APIs.
 - [x] Digital twin builder: deterministic nine-node/seven-edge snapshot, API and interactive evidence panel.
 - [x] Waste detection engine: three explainable detectors, evidence cards and threshold-boundary tests.
-- [ ] What-if simulation engine.
+- [x] What-if simulation engine: deterministic cost, carbon, performance, risk and confidence result.
 - [ ] Gemini explanation.
 - [ ] Interactive frontend.
 - [ ] Cloud Run deployment and final evidence package.
