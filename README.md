@@ -131,6 +131,10 @@ docker run --rm -p 8080:8080 -e ECOTWIN_DATA_MODE=local ecotwin
 - [Gemini explanation and safety contract](docs/gemini-explanation.md)
 - [Google Cloud and BigQuery evidence](docs/evidence/cloud-foundation.md)
 - [Cloud Run deployment evidence](docs/evidence/cloud-run-deployment.md)
+- [Checkpoint 2 submission copy](docs/submission/checkpoint2-submission.md)
+- [Timed demo script](docs/submission/demo-script.md)
+- [Submission checklist](docs/submission/submission-checklist.md)
+- [Screenshot and evidence index](docs/submission/evidence-index.md)
 
 ## Data integrity and security
 
