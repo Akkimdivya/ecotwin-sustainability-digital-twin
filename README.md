@@ -6,11 +6,13 @@ EcoTwin is a read-only decision-support prototype. It builds a virtual represent
 
 Repository: <https://github.com/Akkimdivya/ecotwin-sustainability-digital-twin>
 
+Live application: <https://ecotwin-1075889318331.us-central1.run.app>
+
 > Simulation only — no production changes.
 
 ## Current build status
 
-Completed Modules 1 through 6:
+Completed Modules 1 through 7:
 
 - Module 1 - delivery foundation: repository, environment configuration, FastAPI service, health checks, Docker, CI and security exclusions.
 - Module 2 - cloud data foundation: validated controlled dataset, live BigQuery schema and data, local fallback, read-only catalog APIs and tests.
@@ -18,6 +20,7 @@ Completed Modules 1 through 6:
 - Module 4 - waste detection: explicit idle-compute, over-provisioning and unattached-storage rules with evidence, confidence, limitations and simulation eligibility.
 - Module 5 - what-if simulation: deterministic before/after cost, estimated operational carbon, performance pressure, risk, confidence, assumptions and source cards.
 - Module 6 - Gemini explanation: structured Vertex AI guidance grounded in the simulation JSON, schema validation, timeout, retry, per-simulation cache and deterministic demo-safe fallback.
+- Module 7 - Google Cloud deployment: public Cloud Run service, live BigQuery reads, Vertex AI through ADC, least-privilege runtime identity and scale-to-zero cost controls.
 
 Google Cloud foundation verified on August 27, 2026:
 
@@ -28,7 +31,7 @@ Google Cloud foundation verified on August 27, 2026:
 - API read mode verified: `bigquery` with no fallback
 - No API keys or service-account key files created
 
-Next: deploy the complete application to Cloud Run and capture the final evidence package.
+Next: capture submission screenshots/video and assemble the final Checkpoint 2 evidence package.
 
 ## Quick start
 
@@ -127,6 +130,7 @@ docker run --rm -p 8080:8080 -e ECOTWIN_DATA_MODE=local ecotwin
 - [What-if simulation methodology](docs/simulation.md)
 - [Gemini explanation and safety contract](docs/gemini-explanation.md)
 - [Google Cloud and BigQuery evidence](docs/evidence/cloud-foundation.md)
+- [Cloud Run deployment evidence](docs/evidence/cloud-run-deployment.md)
 
 ## Data integrity and security
 

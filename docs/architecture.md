@@ -21,6 +21,9 @@ flowchart LR
     M --> D[Deterministic explanation fallback]
     G --> F
     D --> F
+    F --> C[Cloud Run ecotwin]
+    U --> C
+    C --> P[Public read-only demo URL]
 ```
 
 ## Data-mode behavior
@@ -37,3 +40,5 @@ The data source is always visible. Controlled data is never presented as measure
 - No resource mutation endpoint exists.
 - Cloud credentials are obtained through Application Default Credentials at runtime, not committed keys.
 - BigQuery identifiers are validated before they are interpolated into table-qualified SQL.
+- Cloud Run uses a dedicated runtime identity with only BigQuery Data Viewer, BigQuery Job User and Vertex AI User roles.
+- Service-level autoscaling is bounded from zero to two instances for Checkpoint 2 cost control.

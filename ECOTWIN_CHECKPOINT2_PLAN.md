@@ -14,7 +14,8 @@
 - [x] What-if simulation engine: deterministic cost, carbon, performance, risk and confidence result.
 - [x] Gemini explanation: Vertex AI structured output, numerical guardrails, retry, timeout, cache and deterministic fallback.
 - [x] Interactive frontend: full cloud-data-to-explanation hero flow.
-- [ ] Cloud Run deployment and final evidence package.
+- [x] Cloud Run deployment: public revision, live BigQuery mode, Vertex AI response and least-privilege runtime identity.
+- [ ] Final submission screenshots, video and evidence package.
 
 The completed cloud foundation uses project `ecotwin-sustainability-2026`, location `us-central1`, and data version `demo-2026-08-27-v1`. See [cloud foundation evidence](docs/evidence/cloud-foundation.md).
 
