@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Node (frontend is added in a later module)
+node_modules/
+frontend/dist/
+
+# Environment and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*service-account*.json
+application_default_credentials.json
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Runtime artifacts
+*.log
+tmp/
+dist/
+build/
+ecotwin-cloud-bootstrap.zip

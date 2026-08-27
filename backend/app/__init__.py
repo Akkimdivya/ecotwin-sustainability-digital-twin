@@ -1,0 +1,1 @@
+"""EcoTwin backend application package."""

@@ -1,0 +1,39 @@
+[
+  {"resource_id":"vm-api-01","date":"2026-08-20","cpu_mean_pct":17.2,"cpu_p95_pct":31.0,"memory_mean_pct":35.0,"memory_p95_pct":45.0,"network_gb":12.4,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"vm-api-01","date":"2026-08-21","cpu_mean_pct":16.4,"cpu_p95_pct":30.0,"memory_mean_pct":34.0,"memory_p95_pct":44.0,"network_gb":11.8,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"vm-api-01","date":"2026-08-22","cpu_mean_pct":18.1,"cpu_p95_pct":33.0,"memory_mean_pct":36.0,"memory_p95_pct":47.0,"network_gb":13.2,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"vm-api-01","date":"2026-08-23","cpu_mean_pct":15.9,"cpu_p95_pct":29.0,"memory_mean_pct":33.0,"memory_p95_pct":43.0,"network_gb":10.9,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"vm-api-01","date":"2026-08-24","cpu_mean_pct":18.8,"cpu_p95_pct":34.0,"memory_mean_pct":37.0,"memory_p95_pct":48.0,"network_gb":13.8,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"vm-api-01","date":"2026-08-25","cpu_mean_pct":17.6,"cpu_p95_pct":32.0,"memory_mean_pct":35.0,"memory_p95_pct":46.0,"network_gb":12.9,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"vm-api-01","date":"2026-08-26","cpu_mean_pct":16.9,"cpu_p95_pct":31.0,"memory_mean_pct":34.0,"memory_p95_pct":45.0,"network_gb":12.1,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+
+  {"resource_id":"vm-web-01","date":"2026-08-20","cpu_mean_pct":41.0,"cpu_p95_pct":68.0,"memory_mean_pct":49.0,"memory_p95_pct":65.0,"network_gb":24.2,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"vm-web-01","date":"2026-08-21","cpu_mean_pct":43.0,"cpu_p95_pct":71.0,"memory_mean_pct":50.0,"memory_p95_pct":66.0,"network_gb":25.6,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"vm-web-01","date":"2026-08-22","cpu_mean_pct":39.0,"cpu_p95_pct":65.0,"memory_mean_pct":47.0,"memory_p95_pct":62.0,"network_gb":22.8,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"vm-web-01","date":"2026-08-23","cpu_mean_pct":44.0,"cpu_p95_pct":73.0,"memory_mean_pct":52.0,"memory_p95_pct":68.0,"network_gb":26.1,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"vm-web-01","date":"2026-08-24","cpu_mean_pct":45.0,"cpu_p95_pct":74.0,"memory_mean_pct":53.0,"memory_p95_pct":69.0,"network_gb":27.0,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"vm-web-01","date":"2026-08-25","cpu_mean_pct":42.0,"cpu_p95_pct":70.0,"memory_mean_pct":50.0,"memory_p95_pct":66.0,"network_gb":25.0,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"vm-web-01","date":"2026-08-26","cpu_mean_pct":40.0,"cpu_p95_pct":67.0,"memory_mean_pct":48.0,"memory_p95_pct":64.0,"network_gb":23.7,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+
+  {"resource_id":"vm-batch-02","date":"2026-08-20","cpu_mean_pct":2.1,"cpu_p95_pct":4.8,"memory_mean_pct":11.0,"memory_p95_pct":18.0,"network_gb":0.18,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"vm-batch-02","date":"2026-08-21","cpu_mean_pct":1.8,"cpu_p95_pct":4.2,"memory_mean_pct":10.0,"memory_p95_pct":17.0,"network_gb":0.14,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"vm-batch-02","date":"2026-08-22","cpu_mean_pct":2.3,"cpu_p95_pct":5.1,"memory_mean_pct":12.0,"memory_p95_pct":19.0,"network_gb":0.21,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"vm-batch-02","date":"2026-08-23","cpu_mean_pct":1.6,"cpu_p95_pct":4.0,"memory_mean_pct":10.0,"memory_p95_pct":16.0,"network_gb":0.11,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"vm-batch-02","date":"2026-08-24","cpu_mean_pct":2.4,"cpu_p95_pct":5.2,"memory_mean_pct":12.0,"memory_p95_pct":20.0,"network_gb":0.23,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"vm-batch-02","date":"2026-08-25","cpu_mean_pct":2.0,"cpu_p95_pct":4.6,"memory_mean_pct":11.0,"memory_p95_pct":18.0,"network_gb":0.16,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"vm-batch-02","date":"2026-08-26","cpu_mean_pct":2.2,"cpu_p95_pct":4.9,"memory_mean_pct":11.0,"memory_p95_pct":18.0,"network_gb":0.19,"disk_used_pct":null,"source":"CONTROLLED_DEMO"},
+
+  {"resource_id":"sql-orders-01","date":"2026-08-20","cpu_mean_pct":38.0,"cpu_p95_pct":66.0,"memory_mean_pct":54.0,"memory_p95_pct":72.0,"network_gb":18.0,"disk_used_pct":61.0,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"sql-orders-01","date":"2026-08-21","cpu_mean_pct":40.0,"cpu_p95_pct":69.0,"memory_mean_pct":55.0,"memory_p95_pct":73.0,"network_gb":19.2,"disk_used_pct":61.5,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"sql-orders-01","date":"2026-08-22","cpu_mean_pct":36.0,"cpu_p95_pct":63.0,"memory_mean_pct":52.0,"memory_p95_pct":70.0,"network_gb":17.1,"disk_used_pct":62.0,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"sql-orders-01","date":"2026-08-23","cpu_mean_pct":41.0,"cpu_p95_pct":71.0,"memory_mean_pct":56.0,"memory_p95_pct":75.0,"network_gb":20.0,"disk_used_pct":62.5,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"sql-orders-01","date":"2026-08-24","cpu_mean_pct":42.0,"cpu_p95_pct":73.0,"memory_mean_pct":57.0,"memory_p95_pct":76.0,"network_gb":20.7,"disk_used_pct":63.0,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"sql-orders-01","date":"2026-08-25","cpu_mean_pct":39.0,"cpu_p95_pct":68.0,"memory_mean_pct":54.0,"memory_p95_pct":73.0,"network_gb":18.8,"disk_used_pct":63.4,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"sql-orders-01","date":"2026-08-26","cpu_mean_pct":37.0,"cpu_p95_pct":65.0,"memory_mean_pct":53.0,"memory_p95_pct":71.0,"network_gb":17.8,"disk_used_pct":63.8,"source":"CONTROLLED_DEMO"},
+
+  {"resource_id":"disk-api-boot","date":"2026-08-26","cpu_mean_pct":null,"cpu_p95_pct":null,"memory_mean_pct":null,"memory_p95_pct":null,"network_gb":null,"disk_used_pct":46.0,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"disk-orders-data","date":"2026-08-26","cpu_mean_pct":null,"cpu_p95_pct":null,"memory_mean_pct":null,"memory_p95_pct":null,"network_gb":null,"disk_used_pct":63.8,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"disk-orphan-01","date":"2026-08-26","cpu_mean_pct":null,"cpu_p95_pct":null,"memory_mean_pct":null,"memory_p95_pct":null,"network_gb":null,"disk_used_pct":7.0,"source":"CONTROLLED_DEMO"},
+  {"resource_id":"bucket-orders-archive","date":"2026-08-26","cpu_mean_pct":null,"cpu_p95_pct":null,"memory_mean_pct":null,"memory_p95_pct":null,"network_gb":1.2,"disk_used_pct":null,"source":"CONTROLLED_DEMO"}
+]
+

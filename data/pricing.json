@@ -1,0 +1,63 @@
+[
+  {
+    "sku_key": "compute-e2-standard-4",
+    "service_type": "compute_instance",
+    "region": "us-central1",
+    "unit": "instance_hour",
+    "unit_price_usd": 0.134,
+    "effective_date": "2026-08-27",
+    "source_url": "https://cloud.google.com/compute/vm-instance-pricing",
+    "source_type": "CONTROLLED_DEMO_RATE"
+  },
+  {
+    "sku_key": "compute-e2-standard-2",
+    "service_type": "compute_instance",
+    "region": "us-central1",
+    "unit": "instance_hour",
+    "unit_price_usd": 0.067,
+    "effective_date": "2026-08-27",
+    "source_url": "https://cloud.google.com/compute/vm-instance-pricing",
+    "source_type": "CONTROLLED_DEMO_RATE"
+  },
+  {
+    "sku_key": "storage-pd-balanced",
+    "service_type": "persistent_disk",
+    "region": "us-central1",
+    "unit": "gb_month",
+    "unit_price_usd": 0.1,
+    "effective_date": "2026-08-27",
+    "source_url": "https://cloud.google.com/compute/disks-image-pricing",
+    "source_type": "CONTROLLED_DEMO_RATE"
+  },
+  {
+    "sku_key": "storage-pd-ssd",
+    "service_type": "persistent_disk",
+    "region": "us-central1",
+    "unit": "gb_month",
+    "unit_price_usd": 0.17,
+    "effective_date": "2026-08-27",
+    "source_url": "https://cloud.google.com/compute/disks-image-pricing",
+    "source_type": "CONTROLLED_DEMO_RATE"
+  },
+  {
+    "sku_key": "storage-pd-standard",
+    "service_type": "persistent_disk",
+    "region": "us-central1",
+    "unit": "gb_month",
+    "unit_price_usd": 0.04,
+    "effective_date": "2026-08-27",
+    "source_url": "https://cloud.google.com/compute/disks-image-pricing",
+    "source_type": "CONTROLLED_DEMO_RATE"
+  },
+  {
+    "sku_key": "storage-nearline",
+    "service_type": "storage_bucket",
+    "region": "us-central1",
+    "unit": "gb_month",
+    "unit_price_usd": 0.01,
+    "effective_date": "2026-08-27",
+    "source_url": "https://cloud.google.com/storage/pricing",
+    "source_type": "CONTROLLED_DEMO_RATE"
+  }
+]
+

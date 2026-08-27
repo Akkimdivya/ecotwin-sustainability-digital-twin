@@ -1,0 +1,121 @@
+# EcoTwin
+
+**AI-powered sustainability digital twin and what-if simulator for cloud infrastructure.**
+
+EcoTwin is a read-only decision-support prototype. It builds a virtual representation of cloud resources, identifies likely waste, and will simulate an optimization before any production change. Checkpoint 2 uses a clearly labeled, reproducible controlled dataset.
+
+> Simulation only — no production changes.
+
+## Current build status
+
+Completed Modules 1 and 2:
+
+- Module 1 - delivery foundation: repository, environment configuration, FastAPI service, health checks, Docker, CI and security exclusions.
+- Module 2 - cloud data foundation: validated controlled dataset, live BigQuery schema and data, local fallback, read-only catalog APIs and tests.
+
+Google Cloud foundation verified on August 27, 2026:
+
+- Project: `ecotwin-sustainability-2026`
+- Region and BigQuery dataset location: `us-central1`
+- Dataset: `ecotwin_demo`
+- Data version: `demo-2026-08-27-v1`
+- API read mode verified: `bigquery` with no fallback
+- No API keys or service-account key files created
+
+Next modules will add the interactive digital-twin graph, waste detectors and what-if engine.
+
+## Quick start
+
+From the repository root in PowerShell:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r backend\requirements-dev.txt
+$env:ECOTWIN_DATA_MODE = "local"
+uvicorn app.main:app --app-dir backend --reload
+```
+
+Open:
+
+- API documentation: <http://127.0.0.1:8000/docs>
+- Health: <http://127.0.0.1:8000/api/health>
+- Data status: <http://127.0.0.1:8000/api/data-status>
+
+## Validate and test
+
+```powershell
+$env:PYTHONPATH = "backend"
+python -m scripts.validate_data
+pytest
+ruff check backend
+```
+
+## Data APIs
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /api/health` | Service and repository health |
+| `GET /api/data-status` | Active source, data version and fallback reason |
+| `GET /api/resources` | Normalized resource inventory |
+| `GET /api/telemetry?resource_id=...` | Daily controlled telemetry |
+| `GET /api/dependencies` | Resource graph edges |
+| `GET /api/price-cards` | Versioned controlled price assumptions |
+| `GET /api/carbon-factors` | Versioned controlled carbon assumptions |
+
+## Controlled data
+
+`data/` contains nine synthetic GCP-shaped resources and seven days of telemetry for the core workloads. It intentionally includes:
+
+- An over-provisioning candidate: `vm-api-01` with 4 vCPU.
+- An idle candidate: `vm-batch-02`.
+- A storage-waste candidate: `disk-orphan-01`, unattached for 21 days.
+- Healthy resources to prevent every node being flagged.
+- Seven dependency relationships for the future digital-twin graph.
+
+Price cards and regional carbon factors are **controlled scenario assumptions**, not invoices or verified emissions. Their source type and effective date are stored with every value.
+
+## BigQuery preview and load
+
+The loader validates every row and every cross-resource reference before touching Google Cloud. It runs in preview mode unless `--apply` is supplied.
+
+```powershell
+Set-Location backend
+python -m scripts.load_bigquery --project YOUR_PROJECT_ID
+python -m scripts.load_bigquery --project YOUR_PROJECT_ID --apply
+Set-Location ..
+```
+
+The apply command creates/replaces the controlled tables in `ecotwin_demo`. It does not create keys. Authenticate with Application Default Credentials or run it from an identity-enabled Google Cloud environment.
+
+To make the API prefer BigQuery:
+
+```powershell
+$env:ECOTWIN_DATA_MODE = "auto"
+$env:ECOTWIN_GCP_PROJECT = "YOUR_PROJECT_ID"
+$env:ECOTWIN_BIGQUERY_DATASET = "ecotwin_demo"
+```
+
+Use `ECOTWIN_DATA_MODE=bigquery` only when startup should fail rather than fall back.
+
+## Docker
+
+```powershell
+docker build -t ecotwin .
+docker run --rm -p 8080:8080 -e ECOTWIN_DATA_MODE=local ecotwin
+```
+
+## Documentation
+
+- [Checkpoint 2 implementation plan](ECOTWIN_CHECKPOINT2_PLAN.md)
+- [Foundation architecture](docs/architecture.md)
+- [Google Cloud and BigQuery evidence](docs/evidence/cloud-foundation.md)
+
+## Data integrity and security
+
+- All JSON is validated with strict Pydantic models.
+- Telemetry and dependency references must point to an existing resource.
+- BigQuery identifiers are validated.
+- Local fallback is visible to the user rather than silently impersonating cloud data.
+- Secrets, service-account files and environment files are excluded from Git and Docker context.
+- There are no cloud mutation endpoints.

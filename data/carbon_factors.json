@@ -1,0 +1,26 @@
+[
+  {
+    "region": "us-central1",
+    "gco2e_per_kwh": 394,
+    "pue": 1.1,
+    "effective_date": "2026-08-27",
+    "source_url": "https://cloud.google.com/carbon-footprint/docs/methodology",
+    "source_type": "CONTROLLED_DEMO_FACTOR"
+  },
+  {
+    "region": "europe-west1",
+    "gco2e_per_kwh": 188,
+    "pue": 1.1,
+    "effective_date": "2026-08-27",
+    "source_url": "https://cloud.google.com/carbon-footprint/docs/methodology",
+    "source_type": "CONTROLLED_DEMO_FACTOR"
+  },
+  {
+    "region": "asia-south1",
+    "gco2e_per_kwh": 708,
+    "pue": 1.1,
+    "effective_date": "2026-08-27",
+    "source_url": "https://cloud.google.com/carbon-footprint/docs/methodology",
+    "source_type": "CONTROLLED_DEMO_FACTOR"
+  }
+]

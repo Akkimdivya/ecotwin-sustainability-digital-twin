@@ -1,0 +1,12 @@
+.git
+.github
+.venv
+__pycache__
+.pytest_cache
+*.pyc
+*.log
+.env*
+*service-account*.json
+frontend/node_modules
+docs/evidence
+

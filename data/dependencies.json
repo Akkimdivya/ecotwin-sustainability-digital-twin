@@ -1,0 +1,10 @@
+[
+  {"source_resource_id": "lb-public-01", "target_resource_id": "vm-web-01", "relationship": "routes_to"},
+  {"source_resource_id": "lb-public-01", "target_resource_id": "vm-api-01", "relationship": "routes_to"},
+  {"source_resource_id": "vm-web-01", "target_resource_id": "vm-api-01", "relationship": "routes_to"},
+  {"source_resource_id": "vm-api-01", "target_resource_id": "sql-orders-01", "relationship": "reads_writes"},
+  {"source_resource_id": "disk-api-boot", "target_resource_id": "vm-api-01", "relationship": "attached_to"},
+  {"source_resource_id": "disk-orders-data", "target_resource_id": "sql-orders-01", "relationship": "attached_to"},
+  {"source_resource_id": "sql-orders-01", "target_resource_id": "bucket-orders-archive", "relationship": "stores_in"}
+]
+
