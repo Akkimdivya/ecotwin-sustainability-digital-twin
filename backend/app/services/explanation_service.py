@@ -101,7 +101,8 @@ class ExplanationService:
                 response_mime_type="application/json",
                 response_schema=ExplanationContent,
                 temperature=0.1,
-                max_output_tokens=1200,
+                max_output_tokens=2000,
+                thinking_config=types.ThinkingConfig(thinking_budget=0),
             ),
         )
         if response.parsed is not None:

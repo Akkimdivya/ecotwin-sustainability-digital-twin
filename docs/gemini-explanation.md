@@ -9,6 +9,7 @@ EcoTwin uses Gemini only after the deterministic simulation engine has calculate
 - Location: `global`, configurable with `ECOTWIN_GEMINI_LOCATION`.
 - Authentication: Application Default Credentials (ADC). No frontend key, API key or downloaded service-account key is required.
 - Enablement: `ECOTWIN_GEMINI_ENABLED=true`. The default is disabled so a local clone remains safe and predictable.
+- Generation: low-temperature structured output with thinking disabled, keeping latency and token use predictable for this explanation-only task.
 
 The implementation follows the official [Vertex AI quickstart](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/start/quickstart), [Google Gen AI SDK guidance](https://cloud.google.com/vertex-ai/generative-ai/docs/sdks/overview), and [Python SDK structured-output API](https://googleapis.github.io/python-genai/index.html).
 
