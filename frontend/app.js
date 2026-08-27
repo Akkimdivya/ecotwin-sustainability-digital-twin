@@ -40,6 +40,7 @@ const stateLabels = {
 };
 
 let twin = null;
+let wasteReport = null;
 let selectedNodeId = null;
 
 function svgElement(name, attributes = {}) {
@@ -190,11 +191,50 @@ function applyFilter(filter) {
   });
 }
 
+function formatEvidenceKey(key) {
+  return key.replaceAll("_", " ");
+}
+
+function renderOpportunities() {
+  document.querySelector("#method-version").textContent = wasteReport.method_version;
+  const grid = document.querySelector("#opportunity-grid");
+  grid.innerHTML = wasteReport.findings.map((finding) => {
+    const chips = Object.entries(finding.evidence)
+      .filter(([, value]) => typeof value !== "object" && value !== null)
+      .slice(0, 4)
+      .map(([key, value]) => `<span class="evidence-chip">${formatEvidenceKey(key)}: ${value}</span>`)
+      .join("");
+    return `
+      <article class="opportunity">
+        <div class="opportunity-top">
+          <span class="opportunity-kind">${formatEvidenceKey(finding.waste_type)}</span>
+          <span class="confidence">${finding.confidence} confidence</span>
+        </div>
+        <h3>${finding.title}</h3>
+        <code>${finding.resource_name}</code>
+        <p>${finding.reason}</p>
+        <div class="evidence-strip">${chips}</div>
+        <button data-resource-id="${finding.resource_id}">Inspect evidence</button>
+      </article>`;
+  }).join("");
+  grid.querySelectorAll("button[data-resource-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectNode(button.dataset.resourceId);
+      document.querySelector("#evidence-card").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+}
+
 async function initialize() {
   try {
-    const response = await fetch("/api/twin");
-    if (!response.ok) throw new Error(`Twin API returned ${response.status}`);
-    twin = await response.json();
+    const [twinResponse, findingsResponse] = await Promise.all([
+      fetch("/api/twin"),
+      fetch("/api/findings"),
+    ]);
+    if (!twinResponse.ok) throw new Error(`Twin API returned ${twinResponse.status}`);
+    if (!findingsResponse.ok) throw new Error(`Findings API returned ${findingsResponse.status}`);
+    twin = await twinResponse.json();
+    wasteReport = await findingsResponse.json();
 
     document.querySelector("#source-badge").textContent = `${twin.data_mode} / ${twin.active_repository}`;
     document.querySelector("#total-nodes").textContent = twin.summary.total_nodes;
@@ -206,6 +246,7 @@ async function initialize() {
     document.querySelector("#data-version").textContent = `Data ${twin.data_version}`;
     loadingState.classList.add("hidden");
     renderGraph();
+    renderOpportunities();
   } catch (error) {
     loadingState.innerHTML = `<strong>Unable to load the digital twin.</strong><span>${error.message}</span>`;
   }

@@ -10,11 +10,12 @@ Repository: <https://github.com/Akkimdivya/ecotwin-sustainability-digital-twin>
 
 ## Current build status
 
-Completed Modules 1 through 3:
+Completed Modules 1 through 4:
 
 - Module 1 - delivery foundation: repository, environment configuration, FastAPI service, health checks, Docker, CI and security exclusions.
 - Module 2 - cloud data foundation: validated controlled dataset, live BigQuery schema and data, local fallback, read-only catalog APIs and tests.
 - Module 3 - digital twin: immutable topology snapshots, validated dependency edges, evidence-backed node states and an interactive graph with node details.
+- Module 4 - waste detection: explicit idle-compute, over-provisioning and unattached-storage rules with evidence, confidence, limitations and simulation eligibility.
 
 Google Cloud foundation verified on August 27, 2026:
 
@@ -67,6 +68,8 @@ ruff check backend
 | `GET /api/carbon-factors` | Versioned controlled carbon assumptions |
 | `GET /api/twin` | Immutable digital-twin topology and summary |
 | `GET /api/twin/nodes/{resource_id}` | Node configuration, telemetry and connections |
+| `GET /api/findings` | Versioned waste report with thresholds and evidence |
+| `GET /api/findings/{finding_id}` | One explainable optimization finding |
 
 ## Controlled data
 
@@ -115,6 +118,7 @@ docker run --rm -p 8080:8080 -e ECOTWIN_DATA_MODE=local ecotwin
 - [Checkpoint 2 implementation plan](ECOTWIN_CHECKPOINT2_PLAN.md)
 - [Foundation architecture](docs/architecture.md)
 - [Digital twin methodology](docs/digital-twin.md)
+- [Waste detection methodology](docs/waste-detection.md)
 - [Google Cloud and BigQuery evidence](docs/evidence/cloud-foundation.md)
 
 ## Data integrity and security

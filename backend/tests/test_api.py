@@ -28,6 +28,9 @@ def test_health_and_controlled_data_endpoints() -> None:
         twin = client.get("/api/twin")
         node = client.get("/api/twin/nodes/vm-api-01")
         missing_node = client.get("/api/twin/nodes/does-not-exist")
+        findings = client.get("/api/findings")
+        finding = client.get("/api/findings/over-provisioned-compute::vm-api-01")
+        missing_finding = client.get("/api/findings/does-not-exist")
         dashboard = client.get("/")
 
     assert health.status_code == 200
@@ -42,6 +45,11 @@ def test_health_and_controlled_data_endpoints() -> None:
     assert node.json()["node"]["state"] == "over_provisioned"
     assert len(node.json()["incoming_edges"]) == 3
     assert missing_node.status_code == 404
+    assert findings.status_code == 200
+    assert findings.json()["summary"]["total_findings"] == 3
+    assert finding.status_code == 200
+    assert finding.json()["resource_id"] == "vm-api-01"
+    assert missing_finding.status_code == 404
     assert dashboard.status_code == 200
     assert "EcoTwin" in dashboard.text
 

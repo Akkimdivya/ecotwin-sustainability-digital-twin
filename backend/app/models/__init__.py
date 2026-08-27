@@ -11,6 +11,7 @@ from .domain import (
     TelemetryDaily,
 )
 from .twin import TwinEdge, TwinNode, TwinNodeDetail, TwinSnapshot
+from .waste import DetectorThresholds, WasteFinding, WasteReport
 
 __all__ = [
     "CarbonFactor",
@@ -25,4 +26,7 @@ __all__ = [
     "TwinNode",
     "TwinNodeDetail",
     "TwinSnapshot",
+    "DetectorThresholds",
+    "WasteFinding",
+    "WasteReport",
 ]

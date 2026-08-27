@@ -12,9 +12,9 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import Settings
-from app.models import DataStatus, TwinNodeDetail, TwinSnapshot
+from app.models import DataStatus, TwinNodeDetail, TwinSnapshot, WasteFinding, WasteReport
 from app.repositories import RepositorySelection, select_repository
-from app.services import build_twin_snapshot
+from app.services import build_twin_snapshot, detect_waste
 
 
 def _configure_logging(level: str) -> None:
@@ -40,11 +40,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def lifespan(app: FastAPI):
         current = select_repository(resolved_settings)
         app.state.selection = current
-        app.state.twin_snapshot = build_twin_snapshot(
+        snapshot = build_twin_snapshot(
             current.catalog,
             data_mode=display_source_for(current),
             active_repository=current.active_mode,
         )
+        app.state.twin_snapshot = snapshot
+        app.state.waste_report = detect_waste(snapshot)
         yield
 
     app = FastAPI(
@@ -70,6 +72,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     def twin_snapshot(request: Request) -> TwinSnapshot:
         return request.app.state.twin_snapshot
+
+    def waste_report(request: Request) -> WasteReport:
+        return request.app.state.waste_report
 
     @app.get("/", include_in_schema=False)
     def root():
@@ -152,6 +157,28 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             incoming_edges=tuple(edge for edge in snapshot.edges if edge.target == resource_id),
             outgoing_edges=tuple(edge for edge in snapshot.edges if edge.source == resource_id),
         )
+
+    @app.get("/api/findings", response_model=WasteReport, tags=["waste detection"])
+    def waste_findings(request: Request) -> WasteReport:
+        return waste_report(request)
+
+    @app.get(
+        "/api/findings/{finding_id}",
+        response_model=WasteFinding,
+        tags=["waste detection"],
+    )
+    def waste_finding(finding_id: str, request: Request) -> WasteFinding:
+        finding = next(
+            (
+                candidate
+                for candidate in waste_report(request).findings
+                if candidate.finding_id == finding_id
+            ),
+            None,
+        )
+        if finding is None:
+            raise HTTPException(status_code=404, detail="Waste finding not found")
+        return finding
 
     return app
 
