@@ -4,6 +4,8 @@
 
 EcoTwin is a read-only decision-support prototype. It builds a virtual representation of cloud resources, identifies likely waste, and will simulate an optimization before any production change. Checkpoint 2 uses a clearly labeled, reproducible controlled dataset.
 
+Repository: <https://github.com/Akkimdivya/ecotwin-sustainability-digital-twin>
+
 > Simulation only — no production changes.
 
 ## Current build status
