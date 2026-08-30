@@ -10,6 +10,7 @@ from .domain import (
     SimulationRun,
     TelemetryDaily,
 )
+from .api import DashboardSummary, MethodologySnapshot
 from .explanation import ExplanationContent, SimulationExplanation
 from .simulation import RightsizeRequest, RightsizeResult
 from .twin import TwinEdge, TwinNode, TwinNodeDetail, TwinSnapshot
@@ -19,6 +20,8 @@ __all__ = [
     "CarbonFactor",
     "DataStatus",
     "Dependency",
+    "DashboardSummary",
+    "MethodologySnapshot",
     "PriceCard",
     "Resource",
     "ResourceCatalog",

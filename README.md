@@ -66,6 +66,7 @@ ruff check backend
 |---|---|
 | `GET /api/health` | Service and repository health |
 | `GET /api/data-status` | Active source, data version and fallback reason |
+| `GET /api/summary` | Dashboard totals for cost, carbon and opportunities |
 | `GET /api/resources` | Normalized resource inventory |
 | `GET /api/telemetry?resource_id=...` | Daily controlled telemetry |
 | `GET /api/dependencies` | Resource graph edges |
@@ -74,10 +75,14 @@ ruff check backend
 | `GET /api/twin` | Immutable digital-twin topology and summary |
 | `GET /api/twin/nodes/{resource_id}` | Node configuration, telemetry and connections |
 | `GET /api/findings` | Versioned waste report with thresholds and evidence |
+| `GET /api/opportunities` | Alias for the same waste report, kept for module 6 parity |
 | `GET /api/findings/{finding_id}` | One explainable optimization finding |
 | `POST /api/simulations` | Run a read-only compute right-sizing scenario |
+| `GET /api/simulations/{simulation_id}` | Retrieve a stored simulation result |
+| `POST /api/simulations/{simulation_id}/explain` | Explain a stored simulation by ID |
 | `GET /api/ai-status` | Gemini mode, model, location and credential policy |
 | `POST /api/explanations` | Re-run the deterministic scenario and explain its exact result |
+| `GET /api/methodology` | Versioned thresholds, assumptions and guardrails |
 
 ## Controlled data
 
