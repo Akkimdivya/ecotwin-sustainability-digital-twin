@@ -8,12 +8,12 @@
 - Google Cloud project: `ecotwin-sustainability-2026`
 - Region: `us-central1`
 - Cloud Run service: `ecotwin`
-- Ready revision: `ecotwin-00003-6m9`
-- Git commit deployed: `f5226d7`
+- Ready revision: `ecotwin-00004-v88`
+- Git commit deployed: `c227448`
 - Traffic: 100% to the ready revision
 - Public access: `allUsers` has only `roles/run.invoker` on the service
 
-The production container was built from the repository Dockerfile through Cloud Build and stored in the regional `cloud-run-source-deploy` Artifact Registry repository. The verified revision was produced by Cloud Build `5327f9b8-d24a-401f-80a1-0425f1c8d6f8`.
+The production container was built from the repository Dockerfile through Cloud Build and stored in the regional `cloud-run-source-deploy` Artifact Registry repository. The verified revision was produced by Cloud Build `be624769-6aea-4bfb-88a8-9ebc671e0745`.
 
 ## Runtime controls
 
