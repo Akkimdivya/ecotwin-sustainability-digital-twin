@@ -60,8 +60,17 @@
             <p class="eyebrow">Infrastructure intelligence / Digital twin</p>
             <h1>See the cloud before you change it.</h1>
             <p class="hero-copy">
-              A versioned, read-only map of resources, dependencies and utilization evidence.
+              A read-only control plane for controlled cloud data, waste detection and safe right-sizing.
             </p>
+            <div class="hero-actions" aria-label="Primary actions">
+              <a class="hero-cta primary" href="#what-if-simulator">Run simulation</a>
+              <a class="hero-cta secondary" href="#twin-panel">Inspect twin</a>
+            </div>
+            <div class="hero-trust" aria-label="Platform highlights">
+              <span>Public Cloud Run</span>
+              <span>Controlled demo data</span>
+              <span>Gemini explanation</span>
+            </div>
           </div>
           <aside class="hero-panel" aria-label="Operational posture">
             <div class="hero-panel-top">
@@ -122,11 +131,12 @@
         </section>
 
         <section class="workspace">
-          <article class="graph-card">
+          <article class="graph-card" id="twin-panel">
             <div class="card-heading">
               <div>
                 <p class="eyebrow">Topology</p>
                 <h2>Cloud dependency map</h2>
+                <p class="graph-copy">Immutable topology, live evidence and read-only state changes.</p>
               </div>
               <div class="legend" aria-label="Node state legend">
                 <span><i class="healthy"></i>Healthy</span>
@@ -183,7 +193,7 @@
           </aside>
         </section>
 
-        <section class="opportunities-card" aria-labelledby="opportunities-title">
+        <section class="opportunities-card" aria-labelledby="opportunities-title" id="opportunities-panel">
           <div class="card-heading">
             <div>
               <p class="eyebrow">Waste detection</p>
