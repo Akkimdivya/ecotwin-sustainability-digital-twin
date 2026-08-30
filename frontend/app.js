@@ -2,6 +2,9 @@ const svg = document.querySelector("#twin-graph");
 const loadingState = document.querySelector("#loading-state");
 const emptyEvidence = document.querySelector("#empty-evidence");
 const evidenceContent = document.querySelector("#evidence-content");
+const activityLog = document.querySelector("#activity-log");
+const activityCount = document.querySelector("#activity-count");
+const flowSteps = Array.from(document.querySelectorAll("[data-flow-step]"));
 
 const positions = {
   "lb-public-01": [105, 260],
@@ -39,9 +42,56 @@ const stateLabels = {
   unassessed: "Unassessed",
 };
 
+const flowOrder = ["source", "twin", "waste", "simulate", "explain"];
+const activityEntries = [];
+
 let twin = null;
 let wasteReport = null;
 let selectedNodeId = null;
+
+function renderActivityLog() {
+  if (!activityLog || !activityCount) {
+    return;
+  }
+  activityCount.textContent = `${activityEntries.length} event${activityEntries.length === 1 ? "" : "s"}`;
+  if (!activityEntries.length) {
+    activityLog.innerHTML = '<li class="activity-empty">Waiting for the first action.</li>';
+    return;
+  }
+  activityLog.innerHTML = activityEntries
+    .slice(0, 6)
+    .map(
+      (entry) => `
+        <li class="activity-entry ${entry.level}">
+          <time datetime="${entry.timestamp}">${entry.timeLabel}</time>
+          <div>
+            <strong>${entry.title}</strong>
+            <p>${entry.detail}</p>
+          </div>
+        </li>`
+    )
+    .join("");
+}
+
+function logActivity(level, title, detail) {
+  const now = new Date();
+  activityEntries.unshift({
+    level,
+    title,
+    detail,
+    timestamp: now.toISOString(),
+    timeLabel: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+  });
+  renderActivityLog();
+}
+
+function setFlowStage(stage) {
+  const index = flowOrder.indexOf(stage);
+  flowSteps.forEach((step, stepIndex) => {
+    step.classList.toggle("is-active", stepIndex === index);
+    step.classList.toggle("is-complete", stepIndex < index);
+  });
+}
 
 function svgElement(name, attributes = {}) {
   const element = document.createElementNS("http://www.w3.org/2000/svg", name);
@@ -181,6 +231,7 @@ function selectNode(nodeId) {
   document.querySelector("#connection-list").innerHTML = connections.length
     ? connections.join("")
     : '<div class="connection empty">No dependency edges</div>';
+  logActivity("info", "Resource selected", `${node.name} opened for configuration, telemetry and dependency review.`);
 }
 
 function applyFilter(filter) {
@@ -189,6 +240,7 @@ function applyFilter(filter) {
     const shouldDim = filter === "review" && element.dataset.state === "healthy";
     element.classList.toggle("dimmed", shouldDim);
   });
+  logActivity("info", "Graph filter updated", filter === "review" ? "Showing nodes that need attention." : "Showing the full resource map.");
 }
 
 function formatEvidenceKey(key) {
@@ -196,7 +248,7 @@ function formatEvidenceKey(key) {
 }
 
 function renderOpportunities() {
-  document.querySelector("#method-version").textContent = wasteReport.method_version;
+  document.querySelector("#method-version").textContent = `${wasteReport.method_version}`;
   const grid = document.querySelector("#opportunity-grid");
   grid.innerHTML = wasteReport.findings.map((finding) => {
     const chips = Object.entries(finding.evidence)
@@ -252,9 +304,12 @@ function prepareSimulation(resourceId) {
   proposedMemory.min = String(targetMemory);
   proposedMemory.max = String(targetMemory);
   proposedMemory.value = String(targetMemory);
+  setFlowStage("simulate");
+  logActivity("warn", "Simulation prepared", `${node.name} is queued for a read-only right-size scenario.`);
 }
 
 function renderSimulation(result) {
+  setFlowStage("simulate");
   document.querySelector("#simulation-placeholder").classList.add("hidden");
   document.querySelector("#simulation-results").classList.remove("hidden");
   document.querySelector("#simulation-id").textContent = `${result.simulation_id} / ${result.method_version}`;
@@ -267,14 +322,19 @@ function renderSimulation(result) {
   document.querySelector("#carbon-before").textContent = `${result.before.estimated_carbon_kgco2e.toFixed(2)} kg`;
   document.querySelector("#carbon-after").textContent = `${result.after.estimated_carbon_kgco2e.toFixed(2)} kg`;
   document.querySelector("#carbon-impact").textContent = `${result.impact.carbon_reduction_kgco2e.toFixed(2)} kg reduced / ${result.impact.carbon_reduction_pct}%`;
-  document.querySelector("#cpu-projection").textContent = `${result.performance.current_cpu_p95_pct}% → ${result.performance.predicted_cpu_p95_pct}%`;
-  document.querySelector("#memory-projection").textContent = `${result.performance.current_memory_p95_pct}% → ${result.performance.predicted_memory_p95_pct}%`;
+  document.querySelector("#cpu-projection").textContent = `${result.performance.current_cpu_p95_pct}% \u2192 ${result.performance.predicted_cpu_p95_pct}%`;
+  document.querySelector("#memory-projection").textContent = `${result.performance.current_memory_p95_pct}% \u2192 ${result.performance.predicted_memory_p95_pct}%`;
   document.querySelector("#cpu-bar").style.width = `${result.performance.predicted_cpu_p95_pct}%`;
   document.querySelector("#memory-bar").style.width = `${result.performance.predicted_memory_p95_pct}%`;
   document.querySelector("#risk-reasons").innerHTML = result.risk.reasons.map((reason) => `<div>${reason}</div>`).join("");
   document.querySelector("#confidence-level").textContent = result.confidence;
   document.querySelector("#confidence-reason").textContent = result.confidence_reason;
   document.querySelector("#simulation-assumptions").innerHTML = result.assumptions.map((assumption) => `<li>${assumption}</li>`).join("");
+  logActivity(
+    "success",
+    "Simulation completed",
+    `${result.simulation_id} produced ${result.risk.level.toLowerCase()} risk with ${result.impact.monthly_cost_savings_usd.toFixed(2)} USD savings.`
+  );
 }
 
 async function runSimulation(event) {
@@ -282,6 +342,8 @@ async function runSimulation(event) {
   const button = event.currentTarget.querySelector("button[type='submit']");
   const error = document.querySelector("#simulation-error");
   const resourceId = document.querySelector("#simulation-resource-id").textContent;
+  setFlowStage("simulate");
+  logActivity("warn", "Simulation started", `Submitting a read-only scenario for ${resourceId}.`);
   button.disabled = true;
   error.classList.add("hidden");
   try {
@@ -303,6 +365,7 @@ async function runSimulation(event) {
   } catch (failure) {
     error.textContent = failure.message;
     error.classList.remove("hidden");
+    logActivity("error", "Simulation failed", failure.message);
   } finally {
     button.disabled = false;
   }
@@ -312,6 +375,7 @@ async function loadExplanation(simulationRequest) {
   const loading = document.querySelector("#ai-loading");
   const content = document.querySelector("#ai-content");
   const provider = document.querySelector("#ai-provider");
+  setFlowStage("explain");
   loading.textContent = "Explaining the deterministic result...";
   loading.classList.remove("hidden");
   content.classList.add("hidden");
@@ -336,22 +400,33 @@ async function loadExplanation(simulationRequest) {
     document.querySelector("#ai-rollback").textContent = explanation.content.rollback_trigger;
     loading.classList.add("hidden");
     content.classList.remove("hidden");
+    logActivity(
+      explanation.provider === "VERTEX_AI" ? "success" : "warn",
+      "Explanation loaded",
+      `${explanation.provider === "VERTEX_AI" ? "Vertex AI" : "Deterministic fallback"} produced the recommendation for ${simulationRequest.resource_id}.`
+    );
   } catch (failure) {
     loading.textContent = `Explanation unavailable: ${failure.message}`;
     provider.textContent = "Unavailable";
+    logActivity("error", "Explanation unavailable", failure.message);
   }
 }
 
 async function initialize() {
   try {
-    const [twinResponse, findingsResponse] = await Promise.all([
+    renderActivityLog();
+    logActivity("info", "Loading dashboard", "Fetching the controlled twin snapshot, opportunities and methodology.");
+    const [twinResponse, findingsResponse, methodologyResponse] = await Promise.all([
       fetch("/api/twin"),
       fetch("/api/findings"),
+      fetch("/api/methodology"),
     ]);
     if (!twinResponse.ok) throw new Error(`Twin API returned ${twinResponse.status}`);
     if (!findingsResponse.ok) throw new Error(`Findings API returned ${findingsResponse.status}`);
+    if (!methodologyResponse.ok) throw new Error(`Methodology API returned ${methodologyResponse.status}`);
     twin = await twinResponse.json();
     wasteReport = await findingsResponse.json();
+    const methodology = await methodologyResponse.json();
 
     document.querySelector("#source-badge").textContent = `${twin.data_mode} / ${twin.active_repository}`;
     document.querySelector("#total-nodes").textContent = twin.summary.total_nodes;
@@ -361,11 +436,16 @@ async function initialize() {
     document.querySelector("#snapshot-time").textContent = new Date(twin.snapshot_at).toLocaleDateString();
     document.querySelector("#graph-caption").textContent = `${twin.summary.total_nodes} nodes / ${twin.summary.total_edges} immutable edges`;
     document.querySelector("#data-version").textContent = `Data ${twin.data_version}`;
+    document.querySelector("#flow-source").textContent = `${twin.data_mode} / ${twin.active_repository}`;
+    document.querySelector("#method-version").textContent = `${wasteReport.method_version} / ${methodology.simulation_method_version}`;
     loadingState.classList.add("hidden");
     renderGraph();
     renderOpportunities();
+    setFlowStage("waste");
+    logActivity("success", "Dashboard ready", `${twin.summary.total_nodes} resources loaded with ${wasteReport.findings.length} opportunities.`);
   } catch (error) {
     loadingState.innerHTML = `<strong>Unable to load the digital twin.</strong><span>${error.message}</span>`;
+    logActivity("error", "Dashboard load failed", error.message);
   }
 }
 

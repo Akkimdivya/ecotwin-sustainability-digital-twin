@@ -8,6 +8,12 @@
       content="EcoTwin sustainability digital twin for Google Cloud infrastructure"
     />
     <title>EcoTwin | Infrastructure Digital Twin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="/assets/styles.css" />
   </head>
   <body>
@@ -53,6 +59,34 @@
           </article>
           <article class="metric-card">
             <span>Snapshot</span><strong class="compact" id="snapshot-id">--</strong><small id="snapshot-time">versioned</small>
+          </article>
+        </section>
+
+        <section class="flow-strip" aria-label="Checkpoint flow">
+          <article class="flow-step is-active" data-flow-step="source">
+            <span>01</span>
+            <strong>Source</strong>
+            <small id="flow-source">Controlled demo data</small>
+          </article>
+          <article class="flow-step" data-flow-step="twin">
+            <span>02</span>
+            <strong>Twin</strong>
+            <small>Immutable dependencies</small>
+          </article>
+          <article class="flow-step" data-flow-step="waste">
+            <span>03</span>
+            <strong>Waste</strong>
+            <small>Evidence-backed opportunities</small>
+          </article>
+          <article class="flow-step" data-flow-step="simulate">
+            <span>04</span>
+            <strong>Simulate</strong>
+            <small>Read-only what-if calculation</small>
+          </article>
+          <article class="flow-step" data-flow-step="explain">
+            <span>05</span>
+            <strong>Explain</strong>
+            <small>Gemini guidance and rollback</small>
           </article>
         </section>
 
@@ -152,7 +186,7 @@
                   <strong id="current-vcpu">4 vCPU</strong>
                   <small id="current-memory">16 GB memory</small>
                 </div>
-                <div class="change-arrow" aria-hidden="true">→</div>
+                <div class="change-arrow" aria-hidden="true">&rarr;</div>
                 <div class="proposed-config">
                   <span>Proposed</span>
                   <label>vCPU <input id="proposed-vcpu" type="number" value="2" min="2" max="2" /></label>
@@ -220,7 +254,7 @@
               <div class="ai-explanation" id="ai-explanation">
                 <div class="ai-heading">
                   <div>
-                    <span class="ai-spark" aria-hidden="true">✦</span>
+                    <span class="ai-spark" aria-hidden="true">&#10022;</span>
                     <strong>Gemini recommendation</strong>
                   </div>
                   <span id="ai-provider">Preparing</span>
@@ -237,6 +271,17 @@
               </div>
             </div>
           </div>
+        </section>
+
+        <section class="activity-card" aria-labelledby="activity-title">
+          <div class="card-heading">
+            <div>
+              <p class="eyebrow">Session log</p>
+              <h2 id="activity-title">Recent activity</h2>
+            </div>
+            <span class="method-badge" id="activity-count">0 events</span>
+          </div>
+          <ol class="activity-log" id="activity-log" aria-live="polite"></ol>
         </section>
 
         <footer>

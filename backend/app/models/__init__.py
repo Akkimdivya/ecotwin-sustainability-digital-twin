@@ -1,5 +1,6 @@
 """Pydantic domain models."""
 
+from .api import DashboardSummary, MethodologySnapshot
 from .domain import (
     CarbonFactor,
     DataStatus,
@@ -10,7 +11,6 @@ from .domain import (
     SimulationRun,
     TelemetryDaily,
 )
-from .api import DashboardSummary, MethodologySnapshot
 from .explanation import ExplanationContent, SimulationExplanation
 from .simulation import RightsizeRequest, RightsizeResult
 from .twin import TwinEdge, TwinNode, TwinNodeDetail, TwinSnapshot

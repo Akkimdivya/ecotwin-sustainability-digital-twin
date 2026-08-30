@@ -68,6 +68,7 @@ def test_health_and_controlled_data_endpoints() -> None:
 
     assert health.status_code == 200
     assert health.json()["status"] == "ok"
+    assert health.headers["x-request-id"]
     assert status.json()["display_source"] == "CONTROLLED_DEMO"
     assert status.json()["resource_count"] == 9
     assert len(resources.json()) == 9
@@ -90,9 +91,11 @@ def test_health_and_controlled_data_endpoints() -> None:
     assert finding.json()["resource_id"] == "vm-api-01"
     assert missing_finding.status_code == 404
     assert simulation.status_code == 200
+    assert simulation.headers["x-request-id"]
     assert simulation.json()["impact"]["monthly_cost_savings_usd"] == 48.91
     assert simulation.json()["risk"]["level"] == "HIGH"
     assert invalid_simulation.status_code == 422
+    assert invalid_simulation.json()["request_id"]
     assert stored_simulation.status_code == 200
     assert stored_simulation.json() == simulation.json()
     assert missing_simulation.status_code == 404

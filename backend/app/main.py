@@ -5,16 +5,20 @@ from __future__ import annotations
 import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
+from time import perf_counter
 from typing import Any, Literal, cast
+from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.responses import Response
 
 from app.config import Settings
 from app.models import (
-    DataStatus,
     DashboardSummary,
+    DataStatus,
     MethodologySnapshot,
     RightsizeRequest,
     RightsizeResult,
@@ -24,6 +28,7 @@ from app.models import (
     WasteFinding,
     WasteReport,
 )
+from app.models.domain import DataSource
 from app.repositories import RepositorySelection, select_repository
 from app.services import (
     ExplanationService,
@@ -34,7 +39,6 @@ from app.services import (
     detect_waste,
     simulate_rightsize,
 )
-from app.models.domain import DataSource
 
 
 def _configure_logging(level: str) -> None:
@@ -47,6 +51,8 @@ def _configure_logging(level: str) -> None:
 def create_app(settings: Settings | None = None) -> FastAPI:
     resolved_settings = settings or Settings.from_env()
     _configure_logging(resolved_settings.log_level)
+    request_logger = logging.getLogger("ecotwin.requests")
+    bootstrap_logger = logging.getLogger("ecotwin.bootstrap")
     frontend_dir = Path(__file__).resolve().parents[2] / "frontend"
 
     def display_source_for(current: RepositorySelection) -> DataSource:
@@ -85,6 +91,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         )
         app.state.simulations = {}
         app.state.explanation_service = ExplanationService(resolved_settings)
+        bootstrap_logger.info(
+            "loaded_repository active_mode=%s display_source=%s "
+            "snapshot_id=%s resources=%s edges=%s",
+            current.active_mode,
+            display_source_for(current),
+            snapshot.snapshot_id,
+            len(snapshot.nodes),
+            len(snapshot.edges),
+        )
         yield
 
     app = FastAPI(
@@ -100,10 +115,72 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     if frontend_dir.is_dir():
         app.mount("/assets", StaticFiles(directory=frontend_dir), name="frontend-assets")
 
+    @app.middleware("http")
+    async def request_logging(request: Request, call_next) -> Response:
+        request_id = request.headers.get("X-Request-ID") or uuid4().hex[:12]
+        request.state.request_id = request_id
+        started = perf_counter()
+        try:
+            response = await call_next(request)
+        except Exception:
+            duration_ms = int((perf_counter() - started) * 1000)
+            request_logger.exception(
+                "request_failed method=%s path=%s request_id=%s duration_ms=%s",
+                request.method,
+                request.url.path,
+                request_id,
+                duration_ms,
+            )
+            raise
+        duration_ms = int((perf_counter() - started) * 1000)
+        response.headers["X-Request-ID"] = request_id
+        request_logger.info(
+            "request_completed method=%s path=%s status=%s request_id=%s duration_ms=%s",
+            request.method,
+            request.url.path,
+            response.status_code,
+            request_id,
+            duration_ms,
+        )
+        return response
+
+    def request_id(request: Request) -> str:
+        value = getattr(request.state, "request_id", None)
+        return value or "unknown"
+
     @app.exception_handler(Exception)
-    async def unhandled_error(_: Request, exc: Exception) -> JSONResponse:
+    async def unhandled_error(request: Request, exc: Exception) -> JSONResponse:
+        rid = request_id(request)
         logging.getLogger("ecotwin.errors").exception("Unhandled request error", exc_info=exc)
-        return JSONResponse(status_code=500, content={"detail": "Internal error"})
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Internal error", "request_id": rid},
+            headers={"X-Request-ID": rid},
+        )
+
+    @app.exception_handler(HTTPException)
+    async def http_error(request: Request, exc: HTTPException) -> JSONResponse:
+        rid = request_id(request)
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"detail": exc.detail, "request_id": rid},
+            headers={"X-Request-ID": rid},
+        )
+
+    @app.exception_handler(RequestValidationError)
+    async def validation_error(request: Request, exc: RequestValidationError) -> JSONResponse:
+        rid = request_id(request)
+        logging.getLogger("ecotwin.validation").warning(
+            "validation_failed path=%s request_id=%s errors=%s",
+            request.url.path,
+            rid,
+            exc.errors(),
+        )
+        return JSONResponse(
+            status_code=422,
+            content={"detail": "Validation failed", "request_id": rid},
+            headers={"X-Request-ID": rid},
+        )
 
     def selection(request: Request) -> RepositorySelection:
         return request.app.state.selection
@@ -250,6 +327,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def run_simulation(payload: RightsizeRequest, request: Request) -> RightsizeResult:
         """Calculate a read-only scenario; no Google Cloud resource is mutated."""
 
+        rid = request_id(request)
+        simulation_logger = logging.getLogger("ecotwin.simulation")
+        simulation_logger.info(
+            "simulation_requested request_id=%s resource_id=%s "
+            "proposed_vcpu=%s proposed_memory_gb=%s growth_buffer_pct=%s",
+            rid,
+            payload.resource_id,
+            payload.proposed_vcpu,
+            payload.proposed_memory_gb,
+            payload.growth_buffer_pct,
+        )
         try:
             result = simulate_rightsize(
                 selection(request).catalog,
@@ -258,7 +346,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             )
         except SimulationValidationError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
-        return persist_simulation(request, result)
+        stored = persist_simulation(request, result)
+        simulation_logger.info(
+            "simulation_completed request_id=%s simulation_id=%s "
+            "risk=%s savings_usd=%s carbon_reduction_kgco2e=%s",
+            rid,
+            stored.simulation_id,
+            stored.risk.level,
+            stored.impact.monthly_cost_savings_usd,
+            stored.impact.carbon_reduction_kgco2e,
+        )
+        return stored
 
     @app.get(
         "/api/simulations/{simulation_id}",
@@ -278,7 +376,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         request: Request,
     ) -> SimulationExplanation:
         result = require_simulation(request, simulation_id)
-        return await explanation_service(request).explain(result)
+        rid = request_id(request)
+        explanation = await explanation_service(request).explain(result)
+        logging.getLogger("ecotwin.explanation").info(
+            "explanation_completed request_id=%s simulation_id=%s provider=%s model=%s",
+            rid,
+            simulation_id,
+            explanation.provider,
+            explanation.model,
+        )
+        return explanation
 
     @app.get("/api/ai-status", tags=["Gemini explanation"])
     def ai_status() -> dict[str, Any]:
@@ -300,6 +407,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         payload: RightsizeRequest,
         request: Request,
     ) -> SimulationExplanation:
+        rid = request_id(request)
         try:
             result = simulate_rightsize(
                 selection(request).catalog,
@@ -308,7 +416,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             )
         except SimulationValidationError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
-        return await explanation_service(request).explain(persist_simulation(request, result))
+        stored = persist_simulation(request, result)
+        explanation = await explanation_service(request).explain(stored)
+        logging.getLogger("ecotwin.explanation").info(
+            "explanation_completed request_id=%s simulation_id=%s provider=%s model=%s",
+            rid,
+            stored.simulation_id,
+            explanation.provider,
+            explanation.model,
+        )
+        return explanation
 
     @app.get("/api/methodology", response_model=MethodologySnapshot, tags=["overview"])
     def methodology(request: Request) -> MethodologySnapshot:

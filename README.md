@@ -12,7 +12,7 @@ Live application: <https://ecotwin-1075889318331.us-central1.run.app>
 
 ## Current build status
 
-Completed Modules 1 through 7:
+Completed Modules 1 through 9:
 
 - Module 1 - delivery foundation: repository, environment configuration, FastAPI service, health checks, Docker, CI and security exclusions.
 - Module 2 - cloud data foundation: validated controlled dataset, live BigQuery schema and data, local fallback, read-only catalog APIs and tests.
@@ -20,7 +20,9 @@ Completed Modules 1 through 7:
 - Module 4 - waste detection: explicit idle-compute, over-provisioning and unattached-storage rules with evidence, confidence, limitations and simulation eligibility.
 - Module 5 - what-if simulation: deterministic before/after cost, estimated operational carbon, performance pressure, risk, confidence, assumptions and source cards.
 - Module 6 - Gemini explanation: structured Vertex AI guidance grounded in the simulation JSON, schema validation, timeout, retry, per-simulation cache and deterministic demo-safe fallback.
-- Module 7 - Google Cloud deployment: public Cloud Run service, live BigQuery reads, Vertex AI through ADC, least-privilege runtime identity and scale-to-zero cost controls.
+- Module 7 - Frontend and visual design: polished control-plane UI, interactive dependency graph, evidence cards, session log and responsive layouts for desktop and mobile.
+- Module 8 - Google Cloud deployment: public Cloud Run service, live BigQuery reads, Vertex AI through ADC, least-privilege runtime identity, structured request logging and scale-to-zero cost controls.
+- Module 9 - Testing, validation and evidence: automated tests, linting, browser verification, deployment evidence and reproducible golden scenario notes.
 
 Google Cloud foundation verified on August 27, 2026:
 
@@ -31,7 +33,7 @@ Google Cloud foundation verified on August 27, 2026:
 - API read mode verified: `bigquery` with no fallback
 - No API keys or service-account key files created
 
-Next: capture submission screenshots/video and assemble the final Checkpoint 2 evidence package.
+Next: capture submission screenshots/video and finish the remaining portal submission steps.
 
 ## Quick start
 
