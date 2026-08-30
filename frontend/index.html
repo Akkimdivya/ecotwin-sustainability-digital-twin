@@ -20,10 +20,32 @@
     <div class="app-shell">
       <header class="topbar">
         <a class="brand" href="/" aria-label="EcoTwin home">
-          <span class="brand-mark" aria-hidden="true">E</span>
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 40 40" role="presentation" focusable="false">
+              <defs>
+                <linearGradient id="brand-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#81f3b9" />
+                  <stop offset="100%" stop-color="#b59cff" />
+                </linearGradient>
+              </defs>
+              <polygon
+                points="20,5 31,11 31,23 20,35 9,23 9,11"
+                fill="none"
+                stroke="url(#brand-glow)"
+                stroke-width="2.4"
+                stroke-linejoin="round"
+              />
+              <path d="M13 22L20 12L27 18" fill="none" stroke="#d7ffe8" stroke-linecap="round" stroke-width="1.9" />
+              <path d="M13 22L20 28L27 18" fill="none" stroke="#d7ffe8" stroke-linecap="round" stroke-width="1.9" />
+              <circle cx="13" cy="22" r="2.2" fill="#0a1713" stroke="#d7ffe8" stroke-width="1.5" />
+              <circle cx="20" cy="12" r="2.2" fill="#0a1713" stroke="#d7ffe8" stroke-width="1.5" />
+              <circle cx="27" cy="18" r="2.2" fill="#0a1713" stroke="#d7ffe8" stroke-width="1.5" />
+              <circle cx="20" cy="28" r="2.2" fill="#d7ffe8" />
+            </svg>
+          </span>
           <span>
             <strong>EcoTwin</strong>
-            <small>Sustainability control plane</small>
+            <small>Infrastructure intelligence</small>
           </span>
         </a>
         <div class="topbar-actions">
@@ -41,10 +63,19 @@
               A versioned, read-only map of resources, dependencies and utilization evidence.
             </p>
           </div>
-          <div class="safety-note">
-            <span class="pulse" aria-hidden="true"></span>
-            Simulation only - no production changes
-          </div>
+          <aside class="hero-panel" aria-label="Operational posture">
+            <div class="hero-panel-top">
+              <span class="hero-panel-kicker">Live posture</span>
+              <span class="hero-panel-status"><span class="pulse" aria-hidden="true"></span>Simulation only</span>
+            </div>
+            <p class="hero-panel-title">No production changes. No secret state. Every action is read-only.</p>
+            <ul class="hero-badges">
+              <li>Controlled demo data</li>
+              <li>BigQuery-backed topology</li>
+              <li>Vertex AI fallback safe</li>
+              <li>Structured request logs</li>
+            </ul>
+          </aside>
         </section>
 
         <section class="summary-grid" aria-label="Digital twin summary">
@@ -86,7 +117,7 @@
           <article class="flow-step" data-flow-step="explain">
             <span>05</span>
             <strong>Explain</strong>
-            <small>Gemini guidance and rollback</small>
+            <small>Gemini rationale + rollback</small>
           </article>
         </section>
 
