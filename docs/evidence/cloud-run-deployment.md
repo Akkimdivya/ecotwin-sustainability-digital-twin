@@ -1,6 +1,6 @@
 # Cloud Run deployment evidence
 
-**Verified:** August 28, 2026 (IST)
+**Verified:** August 30, 2026 (IST)
 
 ## Production service
 
@@ -8,12 +8,12 @@
 - Google Cloud project: `ecotwin-sustainability-2026`
 - Region: `us-central1`
 - Cloud Run service: `ecotwin`
-- Ready revision: `ecotwin-00002-zfv`
-- Git commit deployed: `da2d4a8`
+- Ready revision: `ecotwin-00003-6m9`
+- Git commit deployed: `f5226d7`
 - Traffic: 100% to the ready revision
 - Public access: `allUsers` has only `roles/run.invoker` on the service
 
-The production container was built from the repository Dockerfile through Cloud Build and stored in the regional `cloud-run-source-deploy` Artifact Registry repository. The verified revision was produced by Cloud Build `4424f6bc-8b65-4ee5-b239-5a002ba4f1ed`.
+The production container was built from the repository Dockerfile through Cloud Build and stored in the regional `cloud-run-source-deploy` Artifact Registry repository. The verified revision was produced by Cloud Build `5327f9b8-d24a-401f-80a1-0425f1c8d6f8`.
 
 ## Runtime controls
 
@@ -73,4 +73,4 @@ Gemini preserved the engine values and warned: do not implement the recommendati
 
 ## Resilience verification
 
-Before production verification, a deliberately constrained model response was truncated. Pydantic rejected it and EcoTwin returned its deterministic fallback with the exact engine values, proving that an invalid model response cannot break the demo or replace calculated numbers. The generation configuration was then corrected for predictable explanation-only output, tested directly through Vertex AI, deployed as revision 2 and re-verified through the public endpoint.
+Before production verification, a deliberately constrained model response was truncated. Pydantic rejected it and EcoTwin returned its deterministic fallback with the exact engine values, proving that an invalid model response cannot break the demo or replace calculated numbers. The generation configuration was then corrected for predictable explanation-only output, tested directly through Vertex AI, deployed as revision 3 and re-verified through the public endpoint.
