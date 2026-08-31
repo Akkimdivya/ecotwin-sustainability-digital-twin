@@ -71,6 +71,23 @@
               <span>Controlled demo data</span>
               <span>Gemini explanation</span>
             </div>
+            <div class="hero-proof" aria-label="EcoTwin decision guarantees">
+              <div>
+                <span>01</span>
+                <strong>Read-only by design</strong>
+                <small>No cloud mutation endpoint</small>
+              </div>
+              <div>
+                <span>02</span>
+                <strong>Evidence before action</strong>
+                <small>Versioned source and method</small>
+              </div>
+              <div>
+                <span>03</span>
+                <strong>AI stays grounded</strong>
+                <small>Engine values are protected</small>
+              </div>
+            </div>
           </div>
           <aside class="hero-panel" aria-label="Operational posture">
             <div class="hero-panel-top">
@@ -150,6 +167,7 @@
               <button class="filter" data-filter="review">Needs review</button>
               <span id="graph-caption">Preparing topology...</span>
             </div>
+            <p class="graph-scroll-hint">Swipe horizontally to explore the full dependency map.</p>
             <div class="graph-stage" id="graph-stage">
               <div class="loading-state" id="loading-state">
                 <span class="loader"></span>
@@ -239,6 +257,10 @@
                 <input id="growth-buffer" type="range" min="0" max="40" value="20" step="5" />
                 <small>Stress the projection for expected demand growth.</small>
               </label>
+              <div class="simulation-contract">
+                <span>Simulation contract</span>
+                <p>The engine owns cost, carbon and risk. Gemini can explain the result but cannot alter it.</p>
+              </div>
               <button class="simulate-button" type="submit">
                 <span>Run what-if simulation</span>
                 <small>Cost + carbon + performance + risk</small>
@@ -258,7 +280,10 @@
                   <p class="eyebrow">Simulation result</p>
                   <code id="simulation-id">--</code>
                 </div>
-                <span class="risk-badge" id="risk-level">-- risk</span>
+                <div class="result-status">
+                  <span>Deterministic engine</span>
+                  <strong class="risk-badge" id="risk-level">-- risk</strong>
+                </div>
               </div>
               <div class="impact-grid">
                 <article>
