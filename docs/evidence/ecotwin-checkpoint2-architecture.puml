@@ -1,0 +1,95 @@
+@startuml
+!pragma layout smetana
+!theme plain
+
+top to bottom direction
+title <size:28><b>EcoTwin | Production Decision Architecture</b></size>\n<size:14>Controlled cloud evidence -> deterministic simulation -> guarded Gemini explanation</size>
+
+skinparam backgroundColor #061812
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontColor #E9FFF3
+skinparam ArrowColor #63E6A7
+skinparam ArrowFontColor #C6F5D7
+skinparam ArrowThickness 2
+skinparam RoundCorner 16
+skinparam linetype ortho
+skinparam nodesep 42
+skinparam ranksep 52
+
+skinparam package {
+  BackgroundColor #0A211A
+  BorderColor #2A5D47
+  FontColor #83F4B8
+  FontStyle bold
+}
+skinparam rectangle {
+  BackgroundColor #0D2B21
+  BorderColor #367459
+  FontColor #E9FFF3
+}
+skinparam component {
+  BackgroundColor #103426
+  BorderColor #63E6A7
+  FontColor #F2FFF7
+}
+skinparam database {
+  BackgroundColor #102E24
+  BorderColor #6BE9AD
+  FontColor #F2FFF7
+}
+skinparam cloud {
+  BackgroundColor #152C3A
+  BorderColor #76B9FF
+  FontColor #EDF7FF
+}
+skinparam note {
+  BackgroundColor #153728
+  BorderColor #75E9AC
+  FontColor #DBF9E8
+}
+skinparam actor {
+  BorderColor #A8F7CB
+  FontColor #E9FFF3
+}
+
+actor "Public browser\nJudges and operators" as browser
+
+package "Google Cloud | ecotwin-sustainability-2026 | us-central1" {
+  package "Controlled evidence plane" {
+    rectangle "<b>Versioned demo dataset</b>\n9 resources | 32 telemetry rows\n7 immutable dependency edges" as fixtures
+    database "<b>BigQuery: ecotwin_demo</b>\n7 controlled tables\nbounded read queries" as bq
+    fixtures -down-> bq : validate + load
+  }
+
+  package "Cloud Run | ecotwin | read-only API" {
+    component "<b>Immutable digital twin</b>\nTopology + dependencies\nSnapshot identity" as twin
+    component "<b>Waste detection</b>\nIdle | right-size | storage\nEvidence + confidence" as waste
+    component "<b>Deterministic what-if engine</b>\nCost | carbon | performance\nRisk | confidence" as simulator
+    database "<b>simulation_runs</b>\nDurable audit record\nTable-scoped write access" as audit
+
+    twin -down-> waste : immutable snapshot
+    waste -down-> simulator : eligible recommendation
+    simulator -down-> audit : persist calculation
+  }
+
+  package "Vertex AI | global" {
+    cloud "<b>Gemini 2.5 Flash</b>\nExplains fixed simulation JSON\nStructured guidance only" as gemini
+    rectangle "<b>Resilience controls</b>\nSchema validation | retry | cache\nDeterministic fallback" as fallback
+    gemini -down-> fallback : invalid or unavailable response
+  }
+}
+
+browser -down-> twin : Public HTTPS\ninteractive dashboard
+bq --> twin : controlled, bounded reads
+simulator --> gemini : fixed result JSON\nADC identity
+gemini --> simulator : explanation only\nnever changes numbers
+fallback ..> simulator : safe deterministic fallback
+
+note right of simulator
+  <b>Safety contract</b>
+  No production mutation endpoints.
+  Code calculates every value; Gemini
+  can explain the result but cannot alter it.
+end note
+@enduml

@@ -24,7 +24,7 @@ Shows the Gemini provider label, high-risk warning, validation checklist and exp
 
 ![EcoTwin architecture](../evidence/screenshots/04-checkpoint2-architecture.png)
 
-Shows the Google Cloud boundary, BigQuery data plane, Cloud Run decision engine, deterministic simulator, Vertex AI explanation layer, ADC identity and fallback path.
+Shows the Google Cloud boundary, controlled BigQuery data plane, Cloud Run decision engine, deterministic simulator, table-scoped simulation audit, Vertex AI explanation layer, ADC identity and fallback path. The version-controlled source is [PlantUML](../evidence/ecotwin-checkpoint2-architecture.puml).
 
 ## Machine-verifiable evidence
 
