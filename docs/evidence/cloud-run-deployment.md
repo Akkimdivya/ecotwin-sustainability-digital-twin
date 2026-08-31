@@ -1,6 +1,6 @@
 # Cloud Run deployment evidence
 
-**Verified:** August 30, 2026 (IST)
+**Verified:** August 31, 2026 (IST)
 
 ## Production service
 
@@ -8,17 +8,17 @@
 - Google Cloud project: `ecotwin-sustainability-2026`
 - Region: `us-central1`
 - Cloud Run service: `ecotwin`
-- Ready revision: `ecotwin-00006-kch`
-- Git commit deployed: `75ac021`
+- Ready revision: `ecotwin-00009-pv2`
+- Git commit deployed: `e27cda8`
 - Traffic: 100% to the ready revision
 - Public access: `allUsers` has only `roles/run.invoker` on the service
 
-The production container was built from the repository Dockerfile through Cloud Build and stored in the regional `cloud-run-source-deploy` Artifact Registry repository. The verified revision was produced by Cloud Build `a477711d-187c-4c35-a7e6-e5b9e1219f79`.
+The production container was built from the repository Dockerfile through Cloud Build and stored in the regional `cloud-run-source-deploy` Artifact Registry repository. The verified revision was produced by Cloud Build `22cc20fe-cc5d-4bcf-959c-491fd0c91d52`.
 
 ## Runtime controls
 
 - Service account: `ecotwin-runtime@ecotwin-sustainability-2026.iam.gserviceaccount.com`
-- Runtime IAM roles: `roles/bigquery.dataViewer`, `roles/bigquery.jobUser`, `roles/aiplatform.user`
+- Runtime IAM roles: `roles/bigquery.dataViewer`, `roles/bigquery.jobUser`, `roles/aiplatform.user`; `roles/bigquery.dataEditor` is scoped only to `ecotwin_demo.simulation_runs` for audit persistence
 - API keys: none
 - Service-account key files: none
 - Authentication: Application Default Credentials supplied by Cloud Run
@@ -28,7 +28,7 @@ The production container was built from the repository Dockerfile through Cloud 
 - Request timeout: 60 seconds
 - Service-level scaling: 0 minimum, 2 maximum instances
 
-The service account has no Owner, Editor, BigQuery Admin or Vertex AI Admin role. The project contains only the controlled EcoTwin checkpoint dataset, so project-level data viewer access is bounded to the demo project.
+The service account has no Owner, Editor, BigQuery Admin or Vertex AI Admin role. Its write permission is limited to the controlled `simulation_runs` table; project-level data viewer access is bounded to the demo project.
 
 ## Live API verification
 
@@ -70,6 +70,12 @@ For the controlled `vm-api-01` scenario, 4 vCPU/16 GB was compared with 2 vCPU/8
 - fallback reason: `null`.
 
 Gemini preserved the engine values and warned: do not implement the recommendation directly because predicted pressure and dependency criticality make it high risk. The UI also displayed validation steps and a rollback trigger.
+
+The public API also retrieved the persisted simulation by ID after the browser run, confirming the BigQuery-backed audit path works across Cloud Run instances:
+
+```text
+sim-6db42a0b799b9c24 | HIGH | $48.91
+```
 
 ## Resilience verification
 

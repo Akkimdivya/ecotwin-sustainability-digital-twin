@@ -63,7 +63,7 @@ This makes the AI useful without allowing it to fabricate the business case.
 
 ## Validation evidence
 
-- 18 automated backend tests pass.
+- 19 automated backend tests pass.
 - Ruff lint passes.
 - The Docker image builds and runs locally.
 - GitHub Actions is green through run #8.
