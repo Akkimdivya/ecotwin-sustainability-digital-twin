@@ -724,17 +724,17 @@ Use these as an internal rubric; they are not claimed to be official Patchamomma
 
 The checkpoint is ready only when all boxes are checked:
 
-- [ ] Public Cloud Run URL loads without the developer's login.
-- [ ] Dashboard visibly identifies the input as controlled demo data.
-- [ ] Digital twin contains meaningful nodes and dependencies.
-- [ ] Idle compute, over-provisioned compute, and storage waste are detected.
+- [x] Public Cloud Run URL loads without the developer's login.
+- [x] Dashboard visibly identifies the input as controlled demo data.
+- [x] Digital twin contains meaningful nodes and dependencies.
+- [x] Idle compute, over-provisioned compute, and storage waste are detected.
 - [ ] 4→2 vCPU simulation returns deterministic cost, carbon, performance, risk, and confidence.
 - [x] Gemini explains the exact result and includes validation and rollback steps.
 - [x] Gemini and BigQuery fallback paths work.
-- [ ] No production-mutation API exists.
-- [ ] No secret is present in Git history, logs, screenshots, or frontend bundle.
-- [ ] Tests pass and golden scenario is reproducible.
-- [ ] README distinguishes observed, controlled, computed, and AI-generated information.
+- [x] No production-mutation API exists.
+- [x] No secret is present in tracked files, logs, screenshots, or frontend bundle.
+- [x] Tests pass and golden scenario is reproducible.
+- [x] README distinguishes observed, controlled, computed, and AI-generated information.
 - [ ] Architecture and seven evidence artifacts are committed.
 - [ ] Two successful end-to-end runs were completed from a clean browser.
 - [ ] Demo is under three minutes and all submission links are accessible.

@@ -19,6 +19,14 @@ from app.models import (
 
 T = TypeVar("T", bound=BaseModel)
 _IDENTIFIER = re.compile(r"^[A-Za-z0-9_-]+$")
+_TABLE_LIMITS = {
+    "metadata": 2,
+    "resources": 1_000,
+    "telemetry_daily": 10_000,
+    "dependencies": 5_000,
+    "price_cards": 5_000,
+    "carbon_factors": 1_000,
+}
 
 
 class BigQueryRepository:
@@ -35,7 +43,12 @@ class BigQueryRepository:
         self.client = bigquery.Client(project=project, location=location)
 
     def _rows(self, table: str) -> Iterable[dict[str, Any]]:
-        query = f"SELECT * FROM `{self.project}.{self.dataset}.{table}`"  # noqa: S608
+        if table not in _TABLE_LIMITS:
+            raise ValueError(f"Unsupported controlled table: {table}")
+        query = (
+            f"SELECT * FROM `{self.project}.{self.dataset}.{table}` "  # noqa: S608
+            f"LIMIT {_TABLE_LIMITS[table]}"
+        )
         for row in self.client.query(query).result():
             yield dict(row.items())
 

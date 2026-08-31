@@ -5,8 +5,11 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import re
 from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime
+from decimal import Decimal, InvalidOperation
+from typing import Any
 
 from app.config import Settings
 from app.models.explanation import ExplanationContent, SimulationExplanation
@@ -21,11 +24,57 @@ SYSTEM_INSTRUCTION = """
 You are EcoTwin's sustainability decision-support explainer.
 Explain only the supplied, deterministic simulation JSON.
 Never calculate, modify, round, replace, or invent any numeric value.
+Do not introduce numeric thresholds, timelines, or counts that are absent from the supplied JSON.
 Do not claim that a production change was performed.
 State clearly when the risk is HIGH and do not recommend direct implementation in that case.
 Keep rationale concise; do not reveal chain-of-thought or hidden reasoning.
 Return only the requested structured response.
 """.strip()
+
+NUMERIC_TOKEN = re.compile(r"(?<![A-Za-z0-9_.-])\d+(?:\.\d+)?(?![A-Za-z0-9_.-])")
+
+
+def _normalise_number(value: object) -> Decimal:
+    return Decimal(str(value)).normalize()
+
+
+def _result_numbers(value: Any) -> set[Decimal]:
+    if isinstance(value, dict):
+        return set().union(*(_result_numbers(item) for item in value.values()))
+    if isinstance(value, (list, tuple)):
+        return set().union(*(_result_numbers(item) for item in value))
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        return {_normalise_number(value)}
+    return set()
+
+
+def _validate_numerical_faithfulness(
+    content: ExplanationContent,
+    result: RightsizeResult,
+) -> ExplanationContent:
+    """Reject model prose that introduces numbers outside the deterministic result."""
+
+    allowed = _result_numbers(result.model_dump(mode="json"))
+    fields = (
+        content.summary,
+        content.recommendation,
+        content.rationale,
+        content.rollback_trigger,
+        *content.validation_steps,
+        *content.limitations,
+    )
+    unexpected: set[str] = set()
+    for field in fields:
+        for token in NUMERIC_TOKEN.findall(field):
+            try:
+                if _normalise_number(token) not in allowed:
+                    unexpected.add(token)
+            except InvalidOperation:
+                unexpected.add(token)
+    if unexpected:
+        values = ", ".join(sorted(unexpected))
+        raise ValueError(f"Gemini introduced unsupported numeric values: {values}")
+    return content
 
 
 class ExplanationService:
@@ -62,6 +111,7 @@ class ExplanationService:
                     self._generator(result),
                     timeout=self.settings.gemini_timeout_seconds,
                 )
+                content = _validate_numerical_faithfulness(content, result)
                 return SimulationExplanation(
                     simulation_id=result.simulation_id,
                     content=content,

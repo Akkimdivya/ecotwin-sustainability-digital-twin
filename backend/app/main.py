@@ -30,6 +30,11 @@ from app.models import (
 )
 from app.models.domain import DataSource
 from app.repositories import RepositorySelection, select_repository
+from app.repositories.simulation_store import (
+    BigQuerySimulationStore,
+    MemorySimulationStore,
+    SimulationStore,
+)
 from app.services import (
     ExplanationService,
     SimulationValidationError,
@@ -89,7 +94,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             active_repository=cast(Literal["local", "bigquery"], current.active_mode),
             fallback_reason=current.fallback_reason,
         )
-        app.state.simulations = {}
+        app.state.simulation_store = (
+            BigQuerySimulationStore(
+                resolved_settings.gcp_project,
+                resolved_settings.bigquery_dataset,
+                resolved_settings.bigquery_location,
+            )
+            if current.active_mode == "bigquery" and resolved_settings.gcp_project
+            else MemorySimulationStore()
+        )
         app.state.explanation_service = ExplanationService(resolved_settings)
         bootstrap_logger.info(
             "loaded_repository active_mode=%s display_source=%s "
@@ -194,11 +207,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def explanation_service(request: Request) -> ExplanationService:
         return request.app.state.explanation_service
 
-    def simulation_store(request: Request) -> dict[str, RightsizeResult]:
-        return request.app.state.simulations
+    def simulation_store(request: Request) -> SimulationStore:
+        return request.app.state.simulation_store
 
-    def persist_simulation(request: Request, result: RightsizeResult) -> RightsizeResult:
-        simulation_store(request)[result.simulation_id] = result
+    def persist_simulation(
+        request: Request,
+        payload: RightsizeRequest,
+        result: RightsizeResult,
+    ) -> RightsizeResult:
+        simulation_store(request).save(payload, result)
         return result
 
     def require_simulation(request: Request, simulation_id: str) -> RightsizeResult:
@@ -346,7 +363,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             )
         except SimulationValidationError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
-        stored = persist_simulation(request, result)
+        stored = persist_simulation(request, payload, result)
         simulation_logger.info(
             "simulation_completed request_id=%s simulation_id=%s "
             "risk=%s savings_usd=%s carbon_reduction_kgco2e=%s",
@@ -416,7 +433,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             )
         except SimulationValidationError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
-        stored = persist_simulation(request, result)
+        stored = persist_simulation(request, payload, result)
         explanation = await explanation_service(request).explain(stored)
         logging.getLogger("ecotwin.explanation").info(
             "explanation_completed request_id=%s simulation_id=%s provider=%s model=%s",

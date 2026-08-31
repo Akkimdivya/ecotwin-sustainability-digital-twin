@@ -18,8 +18,8 @@ Completed Modules 1 through 9. Module 10 submission assets are prepared:
 - Module 2 - cloud data foundation: validated controlled dataset, live BigQuery schema and data, local fallback, read-only catalog APIs and tests.
 - Module 3 - digital twin: immutable topology snapshots, validated dependency edges, evidence-backed node states and an interactive graph with node details.
 - Module 4 - waste detection: explicit idle-compute, over-provisioning and unattached-storage rules with evidence, confidence, limitations and simulation eligibility.
-- Module 5 - what-if simulation: deterministic before/after cost, estimated operational carbon, performance pressure, risk, confidence, assumptions and source cards.
-- Module 6 - Gemini explanation: structured Vertex AI guidance grounded in the simulation JSON, schema validation, timeout, retry, per-simulation cache and deterministic demo-safe fallback.
+- Module 5 - what-if simulation: deterministic before/after cost, estimated operational carbon, performance pressure, risk, confidence, assumptions, source cards and durable BigQuery audit retrieval in cloud mode.
+- Module 6 - Gemini explanation: structured Vertex AI guidance grounded in the simulation JSON, schema and numeric-faithfulness validation, timeout, retry, per-simulation cache and deterministic demo-safe fallback.
 - Module 7 - Frontend and visual design: polished control-plane UI, interactive dependency graph, evidence cards, session log and responsive layouts for desktop and mobile.
 - Module 8 - Google Cloud deployment: public Cloud Run service, live BigQuery reads, Vertex AI through ADC, least-privilege runtime identity, structured request logging and scale-to-zero cost controls.
 - Module 9 - Testing, validation and evidence: automated tests, linting, browser verification, deployment evidence and reproducible golden scenario notes.
@@ -81,7 +81,7 @@ ruff check backend
 | `GET /api/opportunities` | Alias for the same waste report, kept for module 6 parity |
 | `GET /api/findings/{finding_id}` | One explainable optimization finding |
 | `POST /api/simulations` | Run a read-only compute right-sizing scenario |
-| `GET /api/simulations/{simulation_id}` | Retrieve a stored simulation result |
+| `GET /api/simulations/{simulation_id}` | Retrieve a stored simulation result from BigQuery in cloud mode |
 | `POST /api/simulations/{simulation_id}/explain` | Explain a stored simulation by ID |
 | `GET /api/ai-status` | Gemini mode, model, location and credential policy |
 | `POST /api/explanations` | Re-run the deterministic scenario and explain its exact result |
@@ -150,5 +150,7 @@ docker run --rm -p 8080:8080 -e ECOTWIN_DATA_MODE=local ecotwin
 - Telemetry and dependency references must point to an existing resource.
 - BigQuery identifiers are validated.
 - Local fallback is visible to the user rather than silently impersonating cloud data.
+- Cloud-mode simulation results are written once to the controlled `simulation_runs` audit table; local development uses an ephemeral in-memory store.
+- Gemini prose containing numeric values absent from the deterministic result is rejected and replaced by the deterministic fallback.
 - Secrets, service-account files and environment files are excluded from Git and Docker context.
 - There are no cloud mutation endpoints.

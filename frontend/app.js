@@ -49,6 +49,15 @@ let twin = null;
 let wasteReport = null;
 let selectedNodeId = null;
 
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function renderActivityLog() {
   if (!activityLog || !activityCount) {
     return;
@@ -62,11 +71,11 @@ function renderActivityLog() {
     .slice(0, 6)
     .map(
       (entry) => `
-        <li class="activity-entry ${entry.level}">
-          <time datetime="${entry.timestamp}">${entry.timeLabel}</time>
+        <li class="activity-entry ${escapeHtml(entry.level)}">
+          <time datetime="${escapeHtml(entry.timestamp)}">${escapeHtml(entry.timeLabel)}</time>
           <div>
-            <strong>${entry.title}</strong>
-            <p>${entry.detail}</p>
+            <strong>${escapeHtml(entry.title)}</strong>
+            <p>${escapeHtml(entry.detail)}</p>
           </div>
         </li>`
     )
@@ -176,7 +185,7 @@ function renderGraph() {
 
 function fact(label, value) {
   if (value === null || value === undefined || value === "") return "";
-  return `<div><dt>${label}</dt><dd>${value}</dd></div>`;
+  return `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`;
 }
 
 function formatNumber(value, suffix = "") {
@@ -187,7 +196,7 @@ function connectionMarkup(edge, direction) {
   const peerId = direction === "in" ? edge.source : edge.target;
   const peer = twin.nodes.find((node) => node.id === peerId);
   const arrow = direction === "in" ? "Incoming" : "Outgoing";
-  return `<div class="connection"><span>${arrow} / ${edge.relationship.replace("_", " ")}</span><strong>${peer?.name || peerId}</strong></div>`;
+  return `<div class="connection"><span>${escapeHtml(arrow)} / ${escapeHtml(edge.relationship.replace("_", " "))}</span><strong>${escapeHtml(peer?.name || peerId)}</strong></div>`;
 }
 
 function selectNode(nodeId) {
@@ -254,21 +263,21 @@ function renderOpportunities() {
     const chips = Object.entries(finding.evidence)
       .filter(([, value]) => typeof value !== "object" && value !== null)
       .slice(0, 4)
-      .map(([key, value]) => `<span class="evidence-chip">${formatEvidenceKey(key)}: ${value}</span>`)
+      .map(([key, value]) => `<span class="evidence-chip">${escapeHtml(formatEvidenceKey(key))}: ${escapeHtml(value)}</span>`)
       .join("");
     const action = finding.waste_type === "over_provisioned_compute" ? "simulate" : "inspect";
     const buttonLabel = action === "simulate" ? "Simulate recommendation" : "Inspect evidence";
     return `
       <article class="opportunity">
         <div class="opportunity-top">
-          <span class="opportunity-kind">${formatEvidenceKey(finding.waste_type)}</span>
-          <span class="confidence">${finding.confidence} confidence</span>
+          <span class="opportunity-kind">${escapeHtml(formatEvidenceKey(finding.waste_type))}</span>
+          <span class="confidence">${escapeHtml(finding.confidence)} confidence</span>
         </div>
-        <h3>${finding.title}</h3>
-        <code>${finding.resource_name}</code>
-        <p>${finding.reason}</p>
+        <h3>${escapeHtml(finding.title)}</h3>
+        <code>${escapeHtml(finding.resource_name)}</code>
+        <p>${escapeHtml(finding.reason)}</p>
         <div class="evidence-strip">${chips}</div>
-        <button data-resource-id="${finding.resource_id}" data-action="${action}">${buttonLabel}</button>
+        <button data-resource-id="${escapeHtml(finding.resource_id)}" data-action="${escapeHtml(action)}">${escapeHtml(buttonLabel)}</button>
       </article>`;
   }).join("");
   grid.querySelectorAll("button[data-resource-id]").forEach((button) => {
@@ -326,10 +335,14 @@ function renderSimulation(result) {
   document.querySelector("#memory-projection").textContent = `${result.performance.current_memory_p95_pct}% \u2192 ${result.performance.predicted_memory_p95_pct}%`;
   document.querySelector("#cpu-bar").style.width = `${result.performance.predicted_cpu_p95_pct}%`;
   document.querySelector("#memory-bar").style.width = `${result.performance.predicted_memory_p95_pct}%`;
-  document.querySelector("#risk-reasons").innerHTML = result.risk.reasons.map((reason) => `<div>${reason}</div>`).join("");
+  document.querySelector("#risk-reasons").innerHTML = result.risk.reasons
+    .map((reason) => `<div>${escapeHtml(reason)}</div>`)
+    .join("");
   document.querySelector("#confidence-level").textContent = result.confidence;
   document.querySelector("#confidence-reason").textContent = result.confidence_reason;
-  document.querySelector("#simulation-assumptions").innerHTML = result.assumptions.map((assumption) => `<li>${assumption}</li>`).join("");
+  document.querySelector("#simulation-assumptions").innerHTML = result.assumptions
+    .map((assumption) => `<li>${escapeHtml(assumption)}</li>`)
+    .join("");
   logActivity(
     "success",
     "Simulation completed",
@@ -395,7 +408,7 @@ async function loadExplanation(simulationRequest) {
     document.querySelector("#ai-recommendation").textContent = explanation.content.recommendation;
     document.querySelector("#ai-rationale").textContent = explanation.content.rationale;
     document.querySelector("#ai-validation-steps").innerHTML = explanation.content.validation_steps
-      .map((step) => `<li>${step}</li>`)
+      .map((step) => `<li>${escapeHtml(step)}</li>`)
       .join("");
     document.querySelector("#ai-rollback").textContent = explanation.content.rollback_trigger;
     loading.classList.add("hidden");
@@ -444,7 +457,7 @@ async function initialize() {
     setFlowStage("waste");
     logActivity("success", "Dashboard ready", `${twin.summary.total_nodes} resources loaded with ${wasteReport.findings.length} opportunities.`);
   } catch (error) {
-    loadingState.innerHTML = `<strong>Unable to load the digital twin.</strong><span>${error.message}</span>`;
+    loadingState.innerHTML = `<strong>Unable to load the digital twin.</strong><span>${escapeHtml(error.message)}</span>`;
     logActivity("error", "Dashboard load failed", error.message);
   }
 }

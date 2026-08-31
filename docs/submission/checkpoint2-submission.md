@@ -54,7 +54,7 @@ EcoTwin deliberately separates calculation from explanation:
 
 - deterministic code owns every cost, carbon, utilization, confidence and risk value;
 - Gemini receives the complete simulation JSON and may only explain it;
-- Pydantic validates the structured response;
+- Pydantic validates the structured response and EcoTwin rejects AI prose containing numeric claims absent from the deterministic result;
 - the output includes a validation checklist and rollback trigger;
 - timeout, retry, cache and deterministic fallback protect the demo;
 - the provider and model are visible in the UI.
@@ -63,7 +63,7 @@ This makes the AI useful without allowing it to fabricate the business case.
 
 ## Validation evidence
 
-- 16 automated backend tests pass.
+- 18 automated backend tests pass.
 - Ruff lint passes.
 - The Docker image builds and runs locally.
 - GitHub Actions is green through run #8.

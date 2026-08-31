@@ -23,11 +23,11 @@ The system instruction requires Gemini to:
 - identify a high-risk scenario explicitly and avoid recommending direct implementation;
 - return structured JSON rather than free-form prose.
 
-Pydantic validates six output fields: `summary`, `recommendation`, `rationale`, `validation_steps`, `rollback_trigger`, and `limitations`. The response also records its provider, model, prompt version and generation time. Chain-of-thought is neither requested nor stored.
+Pydantic validates six output fields: `summary`, `recommendation`, `rationale`, `validation_steps`, `rollback_trigger`, and `limitations`. EcoTwin then scans every numeric token in those fields and rejects a response if a number is not present in the deterministic result. The response also records its provider, model, prompt version and generation time. Chain-of-thought is neither requested nor stored.
 
 ## Reliability behavior
 
-Each Vertex AI request has a configurable 10-second timeout and one retry. A successful explanation is cached in memory by deterministic simulation ID. If Gemini is disabled, unconfigured, unavailable, times out or returns invalid output, EcoTwin returns a deterministic explanation containing the exact simulation values. The UI displays whether the response came from Vertex AI or the fallback.
+Each Vertex AI request has a configurable 10-second timeout and one retry. A successful explanation is cached in memory by deterministic simulation ID. If Gemini is disabled, unconfigured, unavailable, times out, returns invalid structure or introduces unsupported numeric claims, EcoTwin returns a deterministic explanation containing the exact simulation values. The UI displays whether the response came from Vertex AI or the fallback.
 
 ## Verified example
 

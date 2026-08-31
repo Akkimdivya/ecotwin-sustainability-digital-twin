@@ -113,3 +113,26 @@ def test_vertex_failure_retries_once_then_uses_fallback() -> None:
     assert calls == 2
     assert explanation.provider == "DETERMINISTIC_FALLBACK"
     assert explanation.fallback_reason == "RuntimeError"
+
+
+def test_vertex_response_with_invented_number_uses_fallback() -> None:
+    async def invented_number_generator(_):
+        return ExplanationContent(
+            summary="This scenario saves $999.99 each month.",
+            recommendation="Use a monitored canary before any change.",
+            rationale="The supplied risk requires careful validation.",
+            validation_steps=("Validate the proposed change in staging.", "Monitor a canary."),
+            rollback_trigger="Rollback on a service-level breach.",
+            limitations=("Capacity proxy only.",),
+        )
+
+    settings = replace(
+        base_settings(),
+        gemini_enabled=True,
+        gcp_project="test-project",
+    )
+    service = ExplanationService(settings, generator=invented_number_generator)
+    explanation = asyncio.run(service.explain(simulation_result()))
+
+    assert explanation.provider == "DETERMINISTIC_FALLBACK"
+    assert explanation.fallback_reason == "ValueError"
