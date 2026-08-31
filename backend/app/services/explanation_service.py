@@ -25,6 +25,8 @@ You are EcoTwin's sustainability decision-support explainer.
 Explain only the supplied, deterministic simulation JSON.
 Never calculate, modify, round, replace, or invent any numeric value.
 Do not introduce numeric thresholds, timelines, or counts that are absent from the supplied JSON.
+Do not create a timeline such as "24 hours". If a duration is not supplied, describe the
+validation or rollback condition without a duration.
 Do not claim that a production change was performed.
 State clearly when the risk is HIGH and do not recommend direct implementation in that case.
 Keep rationale concise; do not reveal chain-of-thought or hidden reasoning.
@@ -45,6 +47,8 @@ def _result_numbers(value: Any) -> set[Decimal]:
         return set().union(*(_result_numbers(item) for item in value))
     if isinstance(value, (int, float)) and not isinstance(value, bool):
         return {_normalise_number(value)}
+    if isinstance(value, str):
+        return {_normalise_number(token) for token in NUMERIC_TOKEN.findall(value)}
     return set()
 
 
@@ -139,11 +143,17 @@ class ExplanationService:
             location=self.settings.gemini_location,
             http_options=types.HttpOptions(api_version="v1"),
         )
+        allowed_numbers = ", ".join(
+            sorted({str(value) for value in _result_numbers(result.model_dump(mode="json"))})
+        )
         response = await client.aio.models.generate_content(
             model=self.settings.gemini_model,
             contents=(
                 "Explain this EcoTwin simulation result. Use every risk reason, preserve all "
-                "numbers exactly, and provide concrete validation steps and a rollback trigger.\n"
+                "numbers exactly, and provide concrete validation steps and a rollback trigger. "
+                "Allowed numeric tokens are: "
+                + allowed_numbers
+                + ". Do not use any other numeric token.\n"
                 + json.dumps(result.model_dump(mode="json"), sort_keys=True)
             ),
             config=types.GenerateContentConfig(

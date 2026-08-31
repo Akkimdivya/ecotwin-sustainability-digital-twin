@@ -136,3 +136,25 @@ def test_vertex_response_with_invented_number_uses_fallback() -> None:
 
     assert explanation.provider == "DETERMINISTIC_FALLBACK"
     assert explanation.fallback_reason == "ValueError"
+
+
+def test_vertex_response_can_reuse_numeric_risk_boundaries_from_result() -> None:
+    async def boundary_generator(_):
+        return ExplanationContent(
+            summary="The supplied scenario remains HIGH risk.",
+            recommendation="Do not apply the proposed change directly.",
+            rationale="Predicted CPU p95 exceeds 80% and memory p95 exceeds 90%.",
+            validation_steps=("Validate in staging.", "Monitor a controlled canary."),
+            rollback_trigger="Rollback on a service-level breach.",
+            limitations=("Capacity proxy only.",),
+        )
+
+    settings = replace(
+        base_settings(),
+        gemini_enabled=True,
+        gcp_project="test-project",
+    )
+    service = ExplanationService(settings, generator=boundary_generator)
+    explanation = asyncio.run(service.explain(simulation_result()))
+
+    assert explanation.provider == "VERTEX_AI"
