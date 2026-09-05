@@ -8,8 +8,8 @@
 - Google Cloud project: `ecotwin-sustainability-2026`
 - Region: `us-central1`
 - Cloud Run service: `ecotwin`
-- Ready revision: latest revision built from `092e11b` (verified through the public service)
-- Git commit deployed: `092e11b`
+- Ready revision: latest revision built from `f3f93b4` (verified through the public service)
+- Git commit deployed: `f3f93b4`
 - Traffic: 100% to the ready revision
 - Public access: `allUsers` has only `roles/run.invoker` on the service
 
@@ -44,7 +44,7 @@ The data-status endpoint confirmed live BigQuery with no fallback:
 {"requested_mode":"bigquery","active_mode":"bigquery","display_source":"CONTROLLED_DEMO","data_version":"demo-2026-08-27-v1","resource_count":9,"fallback_reason":null}
 ```
 
-The latest public UI verification also confirmed the trust contract added in `092e11b`: read-only design, evidence before action, Gemini numerical guardrails, and the simulator contract that the deterministic engine owns cost, carbon and risk. The responsive layout has no horizontal overflow at a 390 px viewport.
+The latest public UI verification also confirmed the trust contract added in `f3f93b4`: read-only design, evidence before action, Gemini numerical guardrails, and the simulator contract that the deterministic engine owns cost, carbon and risk. The responsive layout has no horizontal overflow at a 390 px viewport.
 
 The AI-status endpoint confirmed Vertex AI through ADC:
 
